@@ -10,6 +10,12 @@ import (
 
 var (
 	ErrUnSupportedToken = "unsupported token: %v"
+	whiteSpace          = map[rune]struct{}{
+		' ':  {},
+		'\n': {},
+		'\r': {},
+		'\t': {},
+	}
 )
 
 type Lexer struct {
@@ -39,6 +45,11 @@ func (l *Lexer) NextToken() (*tokens.Token, error) {
 func (l *Lexer) scanToken() (*tokens.Token, error) {
 	r := l.advance()
 
+	//skip white space
+	for isWhiteSpace(r) {
+		r = l.advance()
+	}
+
 	var (
 		err error
 		tok *tokens.Token
@@ -61,7 +72,6 @@ func (l *Lexer) scanToken() (*tokens.Token, error) {
 		tok = l.buildToken(tokens.LBRACE, "{")
 	case '}':
 		tok = l.buildToken(tokens.RBRACE, "}")
-	case ' ', '\r', '\n', '\t':
 	default:
 		if isDigit(r) {
 			tok, err = l.parseInteger()
@@ -96,6 +106,11 @@ func (l *Lexer) advance() rune {
 	return l.runes[l.current-1]
 }
 
+func isWhiteSpace(r rune) bool {
+	_, ok := whiteSpace[r]
+	return ok
+}
+
 func (l *Lexer) parseInteger() (*tokens.Token, error) {
 	for isDigit(l.peek()) {
 		l.advance()
@@ -115,8 +130,8 @@ func (l *Lexer) parseIdent() *tokens.Token {
 		l.advance()
 	}
 
-	text := string(l.runes[l.start:l.current])
-	return tokens.NewToken(tokens.IDENT, text, text)
+	ident := string(l.runes[l.start:l.current])
+	return tokens.NewToken(tokens.LookupIdent(ident), ident, ident)
 }
 
 func (l *Lexer) match(r rune) bool {

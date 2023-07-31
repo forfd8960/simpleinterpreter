@@ -1,5 +1,10 @@
 package tokens
 
+var keywords = map[string]TokenType{
+	"let": LET,
+	"fn":  FUNCTION,
+}
+
 type Token struct {
 	TkType  TokenType
 	Literal string
@@ -12,4 +17,12 @@ func NewToken(tkType TokenType, literal string, value interface{}) *Token {
 		Literal: literal,
 		Value:   value,
 	}
+}
+
+func LookupIdent(ident string) TokenType {
+	if tp, ok := keywords[ident]; ok {
+		return tp
+	}
+
+	return IDENT
 }
