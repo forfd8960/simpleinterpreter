@@ -101,3 +101,100 @@ func TestComplexTokens(t *testing.T) {
 		})
 	}
 }
+
+func TestMoreTokens(t *testing.T) {
+	input := `
+	let five = 5;
+	let ten = 10;
+	if (five < ten) {
+		return true;
+	} else {
+		return false;
+	};
+	`
+	tests := []struct {
+		expectType tokens.TokenType
+		literal    string
+	}{
+		{tokens.LET, "let"},
+		{tokens.IDENT, "five"},
+		{tokens.ASSIGN, "="},
+		{tokens.INTEGER, "5"},
+		{tokens.SEMICOLON, ";"},
+		{tokens.LET, "let"},
+		{tokens.IDENT, "ten"},
+		{tokens.ASSIGN, "="},
+		{tokens.INTEGER, "10"},
+		{tokens.SEMICOLON, ";"},
+		{tokens.IF, "if"},
+		{tokens.LPRARENT, "("},
+		{tokens.IDENT, "five"},
+		{tokens.LT, "<"},
+		{tokens.IDENT, "ten"},
+		{tokens.RPARENT, ")"},
+		{tokens.LBRACE, "{"},
+		{tokens.RETURN, "return"},
+		{tokens.TRUE, "true"},
+		{tokens.SEMICOLON, ";"},
+		{tokens.RBRACE, "}"},
+		{tokens.ELSE, "else"},
+		{tokens.LBRACE, "{"},
+		{tokens.RETURN, "return"},
+		{tokens.FALSE, "false"},
+		{tokens.SEMICOLON, ";"},
+		{tokens.RBRACE, "}"},
+		{tokens.SEMICOLON, ";"},
+		{tokens.EOF, tokens.LiteralEOF},
+	}
+
+	lexer := NewLexer(input)
+
+	for _, tt := range tests {
+		t.Run("test-"+tt.literal, func(t *testing.T) {
+			token, err := lexer.NextToken()
+
+			assert.Nil(t, err)
+			assert.Equal(t, tt.expectType, token.TkType)
+			assert.Equal(t, tt.literal, token.Literal)
+		})
+	}
+}
+
+func TestMathOperator(t *testing.T) {
+	input := `+ / * -;
+	=;
+	==;
+	!
+	!=;
+	`
+	lexer := NewLexer(input)
+
+	tests := []struct {
+		expectType tokens.TokenType
+		literal    string
+	}{
+		{tokens.PLUS, "+"},
+		{tokens.SLASH, "/"},
+		{tokens.ASTERISK, "*"},
+		{tokens.MINUS, "-"},
+		{tokens.SEMICOLON, ";"},
+		{tokens.ASSIGN, "="},
+		{tokens.SEMICOLON, ";"},
+		{tokens.EQUAL, "=="},
+		{tokens.SEMICOLON, ";"},
+		{tokens.BANG, "!"},
+		{tokens.NOTEQUAL, "!="},
+		{tokens.SEMICOLON, ";"},
+		{tokens.EOF, tokens.LiteralEOF},
+	}
+
+	for _, tt := range tests {
+		t.Run("test-"+tt.literal, func(t *testing.T) {
+			token, err := lexer.NextToken()
+
+			assert.Nil(t, err)
+			assert.Equal(t, tt.expectType, token.TkType)
+			assert.Equal(t, tt.literal, token.Literal)
+		})
+	}
+}
