@@ -9,19 +9,32 @@ const (
 	IDENT
 	INTEGER
 	STRING
-	ASSIGN
-	PLUS
+	ASSIGN   // =
+	PLUS     // +
+	MINUS    // -
+	BANG     // !
+	ASTERISK // *
+	SLASH    // /
+	LT       // <
+	GT       // >
+	EQUAL    // ==
+	NOTEQUAL // !=
 
-	COMMA
-	SEMICOLON
+	COMMA     // ,
+	SEMICOLON // ;
 
 	LPRARENT // (
 	RPARENT  // )
 	LBRACE   // {
 	RBRACE   // }
 
-	FUNCTION // FN
+	FUNCTION // fn
 	LET      // let
+	IF       // if
+	ELSE     // else
+	RETURN   // return
+	TRUE     // true
+	FALSE    // false
 )
 
 const (

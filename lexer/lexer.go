@@ -55,13 +55,25 @@ func (l *Lexer) scanToken() (*tokens.Token, error) {
 
 	switch r {
 	case '=':
-		tok = l.buildToken(tokens.ASSIGN, "=")
+		tok = CondExp(l.match('='), l.buildToken(tokens.EQUAL, "=="), l.buildToken(tokens.ASSIGN, "="))
 	case ';':
 		tok = l.buildToken(tokens.SEMICOLON, ";")
 	case ',':
 		tok = l.buildToken(tokens.COMMA, ",")
 	case '+':
 		tok = l.buildToken(tokens.PLUS, "+")
+	case '-':
+		tok = l.buildToken(tokens.MINUS, "-")
+	case '*':
+		tok = l.buildToken(tokens.ASTERISK, "*")
+	case '/':
+		tok = l.buildToken(tokens.SLASH, "/")
+	case '!':
+		tok = CondExp(l.match('='), l.buildToken(tokens.NOTEQUAL, "!="), l.buildToken(tokens.BANG, "!"))
+	case '<':
+		tok = l.buildToken(tokens.LT, "<")
+	case '>':
+		tok = l.buildToken(tokens.GT, "<")
 	case '(':
 		tok = l.buildToken(tokens.LPRARENT, "(")
 	case ')':
@@ -167,7 +179,7 @@ func (l *Lexer) match(r rune) bool {
 		return false
 	}
 
-	l.advance()
+	l.current++
 	return true
 }
 
