@@ -72,7 +72,7 @@ func TestComplexTokens(t *testing.T) {
 		{tokens.LBRACE, "{"},
 		{tokens.IDENT, "x"},
 		{tokens.PLUS, "+"},
-		{tokens.PLUS, "y"},
+		{tokens.IDENT, "y"},
 		{tokens.SEMICOLON, ";"},
 		{tokens.RBRACE, "}"},
 		{tokens.SEMICOLON, ";"},

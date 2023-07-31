@@ -39,18 +39,19 @@ func (l *Lexer) NextToken() (*tokens.Token, error) {
 		return l.scanToken()
 	}
 
-	return tokens.NewToken(tokens.EOF, tokens.LiteralEOF, nil), nil
+	return newEOFToken(), nil
 }
 
 func (l *Lexer) scanToken() (*tokens.Token, error) {
-	r := l.consumeWhiteSpace()
-
-	//skip white space
-
 	var (
 		err error
 		tok *tokens.Token
 	)
+
+	r := l.consumeWhiteSpace()
+	if l.isAtEnd() {
+		return newEOFToken(), nil
+	}
 
 	switch r {
 	case '=':
@@ -89,6 +90,10 @@ func (l *Lexer) isAtEnd() bool {
 	return l.current >= len(l.runes)
 }
 
+func newEOFToken() *tokens.Token {
+	return tokens.NewToken(tokens.EOF, tokens.LiteralEOF, nil)
+}
+
 func (l *Lexer) buildToken(tkType tokens.TokenType, value interface{}) *tokens.Token {
 	literal := string(l.runes[l.start:l.current])
 	return &tokens.Token{
@@ -109,10 +114,22 @@ func isWhiteSpace(r rune) bool {
 }
 
 func (l *Lexer) consumeWhiteSpace() rune {
-	r := l.advance()
-	for isWhiteSpace(r) {
-		l.start = l.current
-		r = l.advance()
+	var haveWhiteSpace bool
+	// a bc d
+	// start:0, current = 0, => r = a, current=1, return
+	// start:0, current=2, => r=' ', haveWhiteSpace=true, r = ' '
+	// 			current=3, => r='b', start = current-1 = 2
+	//
+	var r = l.advance()
+	for ; isWhiteSpace(r); r = l.advance() {
+		haveWhiteSpace = true
+		if l.isAtEnd() {
+			break
+		}
+	}
+
+	if haveWhiteSpace {
+		l.start = l.current - 1
 	}
 
 	return r
