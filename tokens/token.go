@@ -1,26 +1,15 @@
 package tokens
 
 type Token struct {
-	TkType TokenType
+	TkType  TokenType
 	Literal string
-	Value interface{}
+	Value   interface{}
 }
 
 func NewToken(tkType TokenType, literal string, value interface{}) *Token {
 	return &Token{
-		TkType: tkType,
+		TkType:  tkType,
 		Literal: literal,
-		Value: value,
+		Value:   value,
 	}
 }
-
-type Scanner struct {
-	Text string
-	Tokens []*Token
-	start int
-	current int
-}
-
-func (tk *Scanner) ScanTokens() {}
-
-func (tk *Scanner) parseInt() (*Token, error)

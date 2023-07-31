@@ -1,9 +1,14 @@
 package lexer
 
 import (
+	"fmt"
 	"unicode"
 
 	"github.com/forfd8960/simpleinterpreter/tokens"
+)
+
+var (
+	ErrUnSupportedToken = "unsupported token: %v"
 )
 
 type Lexer struct {
@@ -21,8 +26,43 @@ func NewLexer(input string) *Lexer {
 	}
 }
 
-func (l *Lexer) NextToken() *tokens.Token {
-	return nil
+func (l *Lexer) NextToken() (*tokens.Token, error) {
+	if !l.isAtEnd() {
+		l.start = l.current
+		return l.scanToken()
+	}
+
+	return tokens.NewToken(tokens.EOF, tokens.LiteralEOF, nil), nil
+}
+
+func (l *Lexer) scanToken() (*tokens.Token, error) {
+	r := l.advance()
+
+	var tok *tokens.Token
+
+	switch r {
+	case '=':
+		tok = l.buildToken(tokens.ASSIGN, "=")
+	case ';':
+		tok = l.buildToken(tokens.SEMICOLON, ";")
+	case ',':
+		tok = l.buildToken(tokens.COMMA, ",")
+	case '+':
+		tok = l.buildToken(tokens.PLUS, "+")
+	case '(':
+		tok = l.buildToken(tokens.LPRARENT, "(")
+	case ')':
+		tok = l.buildToken(tokens.RPARENT, ")")
+	case '{':
+		tok = l.buildToken(tokens.LBRACE, "{")
+	case '}':
+		tok = l.buildToken(tokens.RBRACE, "}")
+	case ' ', '\n', '\t':
+	default:
+		return nil, fmt.Errorf(ErrUnSupportedToken, r)
+	}
+
+	return tok, nil
 }
 
 func (l *Lexer) isAtEnd() bool {
@@ -30,7 +70,11 @@ func (l *Lexer) isAtEnd() bool {
 }
 
 func (l *Lexer) buildToken(tkType tokens.TokenType, value interface{}) *tokens.Token {
-	literal := string(l.runes[l.start:l.current])
+	var literal = "eof"
+	if l.start < l.current {
+		literal = string(l.runes[l.start:l.current])
+	}
+
 	return &tokens.Token{
 		TkType:  tkType,
 		Literal: literal,
@@ -39,9 +83,8 @@ func (l *Lexer) buildToken(tkType tokens.TokenType, value interface{}) *tokens.T
 }
 
 func (l *Lexer) advance() rune {
-	pos := l.current
 	l.current++
-	return l.runes[pos]
+	return l.runes[l.current-1]
 }
 
 func (l *Lexer) match(r rune) bool {
