@@ -43,12 +43,9 @@ func (l *Lexer) NextToken() (*tokens.Token, error) {
 }
 
 func (l *Lexer) scanToken() (*tokens.Token, error) {
-	r := l.advance()
+	r := l.consumeWhiteSpace()
 
 	//skip white space
-	for isWhiteSpace(r) {
-		r = l.advance()
-	}
 
 	var (
 		err error
@@ -109,6 +106,16 @@ func (l *Lexer) advance() rune {
 func isWhiteSpace(r rune) bool {
 	_, ok := whiteSpace[r]
 	return ok
+}
+
+func (l *Lexer) consumeWhiteSpace() rune {
+	r := l.advance()
+	for isWhiteSpace(r) {
+		l.start = l.current
+		r = l.advance()
+	}
+
+	return r
 }
 
 func (l *Lexer) parseInteger() (*tokens.Token, error) {
