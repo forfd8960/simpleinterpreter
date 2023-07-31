@@ -66,7 +66,7 @@ func (l *Lexer) scanToken() (*tokens.Token, error) {
 		if isDigit(r) {
 			tok, err = l.parseInteger()
 		} else if isAlpha(r) {
-			tok, err = l.parseIdent()
+			tok = l.parseIdent()
 		} else {
 			err = fmt.Errorf(ErrUnSupportedToken, r)
 		}
@@ -110,8 +110,13 @@ func (l *Lexer) parseInteger() (*tokens.Token, error) {
 	return tokens.NewToken(tokens.INTEGER, text, num), nil
 }
 
-func (l *Lexer) parseIdent() (*tokens.Token, error) {
-	return nil, nil
+func (l *Lexer) parseIdent() *tokens.Token {
+	for isAlpha(l.peek()) {
+		l.advance()
+	}
+
+	text := string(l.runes[l.start:l.current])
+	return tokens.NewToken(tokens.IDENT, text, text)
 }
 
 func (l *Lexer) match(r rune) bool {
