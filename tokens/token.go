@@ -1,5 +1,10 @@
 package tokens
 
+import (
+	"fmt"
+	"strings"
+)
+
 var keywords = map[string]TokenType{
 	"let":    LET,
 	"fn":     FUNCTION,
@@ -22,6 +27,14 @@ func NewToken(tkType TokenType, literal string, value interface{}) *Token {
 		Literal: literal,
 		Value:   value,
 	}
+}
+
+func (tk *Token) String() string {
+	return strings.Join([]string{
+		"TkType: " + tk.TkType.String(),
+		"Literal: " + tk.Literal,
+		fmt.Sprintf("%v", tk.Value),
+	}, ",")
 }
 
 func LookupIdent(ident string) TokenType {

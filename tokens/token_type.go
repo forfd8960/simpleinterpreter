@@ -1,5 +1,6 @@
 package tokens
 
+//go:generate go run github.com/dmarkham/enumer -type=TokenType
 type TokenType int
 
 const (
