@@ -21,6 +21,9 @@ const (
 	EQUAL    // ==
 	NOTEQUAL // !=
 
+	OR  // ||
+	AND // &&
+
 	COMMA     // ,
 	SEMICOLON // ;
 
