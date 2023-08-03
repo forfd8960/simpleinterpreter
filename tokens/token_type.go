@@ -17,7 +17,10 @@ const (
 	ASTERISK // *
 	SLASH    // /
 	LT       // <
+	LTEQ     // <=
 	GT       // >
+	GTEQ     // >=
+
 	EQUAL    // ==
 	NOTEQUAL // !=
 
@@ -39,6 +42,7 @@ const (
 	RETURN   // return
 	TRUE     // true
 	FALSE    // false
+	NIL      // nil
 )
 
 const (

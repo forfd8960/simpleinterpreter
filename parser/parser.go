@@ -143,49 +143,77 @@ func (p *Parser) and() (ast.Expression, error) {
 }
 
 func (p *Parser) equality() (ast.Expression, error) {
-	exp := p.comparison()
-
-	for p.match(token.BangEqual, token.EqualEqual) {
-		op := p.previous()
-		right := p.comparison()
-		exp = expr.NewBinary(exp, right, op)
+	exp, err := p.comparison()
+	if err != nil {
+		return nil, err
 	}
-	return exp
+
+	for p.match(tokens.NOTEQUAL, tokens.EQUAL) {
+		op := p.previous()
+		right, err := p.comparison()
+		if err != nil {
+			return nil, err
+		}
+		exp = ast.NewBinary(exp, right, op)
+	}
+
+	return exp, nil
 }
 
 func (p *Parser) comparison() (ast.Expression, error) {
-	exp := p.term()
-
-	for p.match(token.Greater, token.GreaterEqual, token.Less, token.LessEqual) {
-		op := p.previous()
-		right := p.term()
-		exp = expr.NewBinary(exp, right, op)
+	exp, err := p.term()
+	if err != nil {
+		return nil, err
 	}
-	return exp
+
+	for p.match(tokens.GT, tokens.GT, tokens.LT, tokens.LTEQ) {
+		op := p.previous()
+		right, err := p.term()
+		if err != nil {
+			return nil, err
+		}
+
+		exp = ast.NewBinary(exp, right, op)
+	}
+
+	return exp, nil
 }
 
 func (p *Parser) term() (ast.Expression, error) {
-	exp := p.factor()
-
-	for p.match(token.Minus, token.Plus) {
-		op := p.previous()
-		right := p.factor()
-		exp = expr.NewBinary(exp, right, op)
+	exp, err := p.factor()
+	if err != nil {
+		return nil, err
 	}
 
-	return exp
+	for p.match(tokens.MINUS, tokens.PLUS) {
+		op := p.previous()
+		right, err := p.factor()
+		if err != nil {
+			return nil, err
+		}
+
+		exp = ast.NewBinary(exp, right, op)
+	}
+
+	return exp, nil
 }
 
 func (p *Parser) factor() (ast.Expression, error) {
-	exp := p.unary()
-
-	for p.match(token.Slash, token.Star) {
-		op := p.previous()
-		right := p.unary()
-		exp = expr.NewBinary(exp, right, op)
+	exp, err := p.unary()
+	if err != nil {
+		return nil, err
 	}
 
-	return exp
+	for p.match(tokens.SLASH, tokens.ASTERISK) {
+		op := p.previous()
+		right, err := p.unary()
+		if err != nil {
+			return nil, err
+		}
+		exp = ast.NewBinary(exp, right, op)
+	}
+
+	return exp, nil
 }
 
 func (p *Parser) unary() (ast.Expression, error) {
@@ -196,11 +224,39 @@ func (p *Parser) unary() (ast.Expression, error) {
 			return nil, err
 		}
 
-		return expr.NewUnary(op, right)
+		return ast.NewUnary(op, right), nil
 	}
 
 	// return p.call()
-	return nil, fmt.Errorf("not support call")
+	return p.primary()
+}
+
+func (p *Parser) primary() (ast.Expression, error) {
+	switch {
+	case p.match(tokens.FALSE):
+		return ast.NewLiteral(p.previous()), nil
+	case p.match(tokens.TRUE):
+		return ast.NewLiteral(p.previous()), nil
+	case p.match(tokens.NIL):
+		return ast.NewLiteral(p.previous()), nil
+	case p.match(tokens.INTEGER, tokens.STRING):
+		return ast.NewLiteral(p.previous()), nil
+	case p.match(tokens.IDENT):
+		return ast.NewIdentifier(p.previous()), nil
+	case p.match(tokens.LPRARENT):
+		exp, err := p.parseExpr()
+		if err != nil {
+			return nil, err
+		}
+
+		if _, err := p.consume(tokens.RPARENT, "Expect ')' after expression"); err != nil {
+			return nil, err
+		}
+		return ast.NewGrouping(exp), nil
+
+	}
+
+	return nil, fmt.Errorf("unknow expr")
 }
 
 func (p *Parser) consume(tkType tokens.TokenType, msg string) (*tokens.Token, error) {

@@ -1,6 +1,12 @@
 package ast
 
-import "github.com/forfd8960/simpleinterpreter/tokens"
+import (
+	"github.com/forfd8960/simpleinterpreter/tokens"
+)
+
+type Stringer interface {
+	String() string
+}
 
 type Node interface {
 	TokenLiteral() string
@@ -91,4 +97,58 @@ func NewLogical(left, right Expression, op *tokens.Token) *Logical {
 func (lg *Logical) ExprNode() {}
 func (lg *Logical) TokenLiteral() string {
 	return lg.Operator.Literal
+}
+
+type Binary struct {
+	Left     Expression
+	Operator *tokens.Token
+	Right    Expression
+}
+
+func NewBinary(left, right Expression, operator *tokens.Token) *Binary {
+	return &Binary{Left: left, Operator: operator, Right: right}
+}
+
+func (bin *Binary) ExprNode() {}
+func (bin *Binary) TokenLiteral() string {
+	return bin.Operator.Literal
+}
+
+type Unary struct {
+	Operator *tokens.Token
+	Right    Expression
+}
+
+func NewUnary(operator *tokens.Token, right Expression) *Unary {
+	return &Unary{Operator: operator, Right: right}
+}
+func (un *Unary) ExprNode() {}
+func (un *Unary) TokenLiteral() string {
+	return un.Operator.Literal
+}
+
+type Literal struct {
+	Value *tokens.Token
+}
+
+func NewLiteral(v *tokens.Token) *Literal {
+	return &Literal{Value: v}
+}
+
+func (lter *Literal) ExprNode() {}
+func (lter *Literal) TokenLiteral() string {
+	return lter.Value.Literal
+}
+
+type Grouping struct {
+	Expr Expression
+}
+
+func NewGrouping(expr Expression) *Grouping {
+	return &Grouping{Expr: expr}
+}
+
+func (gp *Grouping) ExprNode() {}
+func (gp *Grouping) TokenLiteral() string {
+	return "grouping"
 }
