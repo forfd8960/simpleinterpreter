@@ -4,7 +4,6 @@ import (
 	"fmt"
 
 	"github.com/forfd8960/simpleinterpreter/ast"
-	"github.com/forfd8960/simpleinterpreter/lexer"
 	"github.com/forfd8960/simpleinterpreter/tokens"
 )
 
@@ -13,12 +12,8 @@ var (
 )
 
 type Parser struct {
-	tokens    []*tokens.Token
-	current   int
-	errors    []error
-	lxer      *lexer.Lexer
-	currentTk *tokens.Token
-	nextTk    *tokens.Token
+	tokens  []*tokens.Token
+	current int
 }
 
 func NewParser(tokens []*tokens.Token) *Parser {
@@ -26,6 +21,20 @@ func NewParser(tokens []*tokens.Token) *Parser {
 	return p
 }
 
+/*
+expression     → equality ;
+equality       → comparison ( ( "!=" | "==" ) comparison )* ;
+comparison     → term ( ( ">" | ">=" | "<" | "<=" ) term )* ;
+term           → factor ( ( "-" | "+" ) factor )* ;
+factor         → unary ( ( "/" | "*" ) unary )* ;
+unary          → ( "!" | "-" ) unary
+
+	| primary ;
+
+primary        → NUMBER | STRING | "true" | "false" | "nil"
+
+	| "(" expression ")" ;
+*/
 func (p *Parser) ParseProgram() (*ast.Program, error) {
 	program := &ast.Program{
 		Stmts: make([]ast.Stmt, 1),
@@ -49,6 +58,8 @@ func (p *Parser) parseStmt() (ast.Stmt, error) {
 	switch {
 	case p.match(tokens.LET):
 		return p.parseLetStmt()
+	case p.match(tokens.RETURN):
+		return p.parseReturnStmt()
 	default:
 		return nil, fmt.Errorf(ErrNotSupportToken)
 	}
@@ -74,6 +85,25 @@ func (p *Parser) parseLetStmt() (ast.Stmt, error) {
 	}
 
 	return ast.NewLetStmt(identToken, initExpr), nil
+}
+
+func (p *Parser) parseReturnStmt() (ast.Stmt, error) {
+	kw := p.previous()
+
+	var value ast.Expression
+	var err error
+	if !p.match(tokens.SEMICOLON) {
+		value, err = p.parseExpr()
+		if err != nil {
+			return nil, err
+		}
+	}
+
+	if _, err = p.consume(tokens.SEMICOLON, "expect `;` after return value"); err != nil {
+		return nil, err
+	}
+
+	return ast.NewReturnStmt(kw, value), nil
 }
 
 func (p *Parser) parseExpr() (ast.Expression, error) {

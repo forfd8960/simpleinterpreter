@@ -13,6 +13,7 @@ var keywords = map[string]TokenType{
 	"return": RETURN,
 	"true":   TRUE,
 	"false":  FALSE,
+	"nil":    NIL,
 }
 
 type Token struct {
