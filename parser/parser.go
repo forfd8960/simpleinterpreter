@@ -41,7 +41,7 @@ func (p *Parser) ParseProgram() (*ast.Program, error) {
 	}
 
 	for !p.isAtEnd() {
-		stmt, err := p.parseStmt()
+		stmt, err := p.declaration()
 		if err != nil {
 			return nil, err
 		}
@@ -54,16 +54,15 @@ func (p *Parser) ParseProgram() (*ast.Program, error) {
 	return program, nil
 }
 
-func (p *Parser) parseStmt() (ast.Stmt, error) {
+func (p *Parser) declaration() (ast.Stmt, error) {
 	switch {
 	case p.match(tokens.LET):
 		return p.parseLetStmt()
-	case p.match(tokens.RETURN):
-		return p.parseReturnStmt()
-	default:
-		return nil, fmt.Errorf(ErrNotSupportToken)
+	case p.match(tokens.FUNCTION):
+		return p.function()
 	}
 
+	return p.statement()
 }
 
 func (p *Parser) parseLetStmt() (ast.Stmt, error) {
@@ -87,6 +86,52 @@ func (p *Parser) parseLetStmt() (ast.Stmt, error) {
 	return ast.NewLetStmt(identToken, initExpr), nil
 }
 
+func (p *Parser) function() (*ast.Function, error) {
+	name, err := p.consume(tokens.IDENT, "expect function name.")
+	if err != nil {
+		return nil, err
+	}
+
+	if _, err := p.consume(tokens.LPRARENT, "Expect `(` after function name."); err != nil {
+		return nil, err
+	}
+
+	var params []*tokens.Token
+	if !p.check(tokens.RPARENT) {
+		ident, err := p.consume(tokens.IDENT, "Expect parameter name.")
+		if err != nil {
+			return nil, err
+		}
+		params = append(params, ident)
+
+		for p.match(tokens.COMMA) {
+			if len(params) > 8 {
+				return nil, fmt.Errorf("cannot have more than 8 parameters")
+			}
+
+			ident, err = p.consume(tokens.IDENT, "Expect parameter name.")
+			if err != nil {
+				return nil, err
+			}
+			params = append(params, ident)
+		}
+	}
+
+	if _, err := p.consume(tokens.RPARENT, "Expect `)` after parameters"); err != nil {
+		return nil, err
+	}
+
+	if _, err := p.consume(tokens.LBRACE, "Expect `{` before function body."); err != nil {
+		return nil, err
+	}
+
+	body, err := p.block()
+	if err != nil {
+		return nil, err
+	}
+	return ast.NewFunctionStmt(name, params, body), nil
+}
+
 func (p *Parser) parseReturnStmt() (ast.Stmt, error) {
 	kw := p.previous()
 
@@ -104,6 +149,73 @@ func (p *Parser) parseReturnStmt() (ast.Stmt, error) {
 	}
 
 	return ast.NewReturnStmt(kw, value), nil
+}
+
+func (p *Parser) statement() (ast.Stmt, error) {
+	switch {
+	case p.match(tokens.FOR):
+		return p.forStatement()
+	case p.match(tokens.IF):
+		return p.ifStatement()
+	case p.match(tokens.RETURN):
+		return p.parseReturnStmt()
+	case p.match(tokens.PRINT):
+		return p.printStatement()
+	case p.match(tokens.WHILE):
+		return p.whileStatement()
+	case p.match(tokens.LBRACE):
+		block, err := p.block()
+		if err != nil {
+			return nil, err
+		}
+		return ast.NewBlockStmt(block), nil
+	}
+
+	return p.expressionStatement()
+}
+
+func (p *Parser) forStatement() (ast.Stmt, error) {
+	return nil, nil
+}
+
+func (p *Parser) ifStatement() (ast.Stmt, error) {
+	return nil, nil
+}
+
+// printStatement
+func (p *Parser) printStatement() (ast.Stmt, error) {
+	return nil, nil
+}
+
+// whileStatement
+func (p *Parser) whileStatement() (ast.Stmt, error) {
+	return nil, nil
+}
+
+func (p *Parser) block() ([]ast.Stmt, error) {
+	statements := make([]ast.Stmt, 0, 1)
+
+	for !p.check(tokens.RBRACE) && !p.isAtEnd() {
+		d, err := p.declaration()
+		if err != nil {
+			return nil, err
+		}
+
+		statements = append(statements, d)
+	}
+
+	p.consume(tokens.RBRACE, `Expect "}" after block!`)
+	return statements, nil
+}
+
+func (p *Parser) expressionStatement() (*ast.ExpressionStmt, error) {
+	value, err := p.parseExpr()
+	if err != nil {
+		return nil, err
+	}
+
+	p.consume(tokens.SEMICOLON, `Expect ":" after value.`)
+	return ast.NewExpressionStmt(value), nil
 }
 
 func (p *Parser) parseExpr() (ast.Expression, error) {

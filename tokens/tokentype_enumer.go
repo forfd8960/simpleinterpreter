@@ -7,11 +7,11 @@ import (
 	"strings"
 )
 
-const _TokenTypeName = "ILLEGALEOFIDENTINTEGERSTRINGASSIGNPLUSMINUSBANGASTERISKSLASHLTLTEQGTGTEQEQUALNOTEQUALORANDCOMMASEMICOLONLPRARENTRPARENTLBRACERBRACEFUNCTIONLETIFELSERETURNTRUEFALSENIL"
+const _TokenTypeName = "ILLEGALEOFIDENTINTEGERSTRINGASSIGNPLUSMINUSBANGASTERISKSLASHLTLTEQGTGTEQEQUALNOTEQUALORANDCOMMASEMICOLONLPRARENTRPARENTLBRACERBRACEFUNCTIONLETIFELSERETURNTRUEFALSENILFORWHILEPRINT"
 
-var _TokenTypeIndex = [...]uint8{0, 7, 10, 15, 22, 28, 34, 38, 43, 47, 55, 60, 62, 66, 68, 72, 77, 85, 87, 90, 95, 104, 112, 119, 125, 131, 139, 142, 144, 148, 154, 158, 163, 166}
+var _TokenTypeIndex = [...]uint8{0, 7, 10, 15, 22, 28, 34, 38, 43, 47, 55, 60, 62, 66, 68, 72, 77, 85, 87, 90, 95, 104, 112, 119, 125, 131, 139, 142, 144, 148, 154, 158, 163, 166, 169, 174, 179}
 
-const _TokenTypeLowerName = "illegaleofidentintegerstringassignplusminusbangasteriskslashltlteqgtgteqequalnotequalorandcommasemicolonlprarentrparentlbracerbracefunctionletifelsereturntruefalsenil"
+const _TokenTypeLowerName = "illegaleofidentintegerstringassignplusminusbangasteriskslashltlteqgtgteqequalnotequalorandcommasemicolonlprarentrparentlbracerbracefunctionletifelsereturntruefalsenilforwhileprint"
 
 func (i TokenType) String() string {
 	if i < 0 || i >= TokenType(len(_TokenTypeIndex)-1) {
@@ -57,9 +57,12 @@ func _TokenTypeNoOp() {
 	_ = x[TRUE-(30)]
 	_ = x[FALSE-(31)]
 	_ = x[NIL-(32)]
+	_ = x[FOR-(33)]
+	_ = x[WHILE-(34)]
+	_ = x[PRINT-(35)]
 }
 
-var _TokenTypeValues = []TokenType{ILLEGAL, EOF, IDENT, INTEGER, STRING, ASSIGN, PLUS, MINUS, BANG, ASTERISK, SLASH, LT, LTEQ, GT, GTEQ, EQUAL, NOTEQUAL, OR, AND, COMMA, SEMICOLON, LPRARENT, RPARENT, LBRACE, RBRACE, FUNCTION, LET, IF, ELSE, RETURN, TRUE, FALSE, NIL}
+var _TokenTypeValues = []TokenType{ILLEGAL, EOF, IDENT, INTEGER, STRING, ASSIGN, PLUS, MINUS, BANG, ASTERISK, SLASH, LT, LTEQ, GT, GTEQ, EQUAL, NOTEQUAL, OR, AND, COMMA, SEMICOLON, LPRARENT, RPARENT, LBRACE, RBRACE, FUNCTION, LET, IF, ELSE, RETURN, TRUE, FALSE, NIL, FOR, WHILE, PRINT}
 
 var _TokenTypeNameToValueMap = map[string]TokenType{
 	_TokenTypeName[0:7]:          ILLEGAL,
@@ -128,6 +131,12 @@ var _TokenTypeNameToValueMap = map[string]TokenType{
 	_TokenTypeLowerName[158:163]: FALSE,
 	_TokenTypeName[163:166]:      NIL,
 	_TokenTypeLowerName[163:166]: NIL,
+	_TokenTypeName[166:169]:      FOR,
+	_TokenTypeLowerName[166:169]: FOR,
+	_TokenTypeName[169:174]:      WHILE,
+	_TokenTypeLowerName[169:174]: WHILE,
+	_TokenTypeName[174:179]:      PRINT,
+	_TokenTypeLowerName[174:179]: PRINT,
 }
 
 var _TokenTypeNames = []string{
@@ -164,6 +173,9 @@ var _TokenTypeNames = []string{
 	_TokenTypeName[154:158],
 	_TokenTypeName[158:163],
 	_TokenTypeName[163:166],
+	_TokenTypeName[166:169],
+	_TokenTypeName[169:174],
+	_TokenTypeName[174:179],
 }
 
 // TokenTypeString retrieves an enum value from the enum constants string name.

@@ -43,6 +43,10 @@ const (
 	TRUE     // true
 	FALSE    // false
 	NIL      // nil
+
+	FOR   // for
+	WHILE // while
+	PRINT // print()
 )
 
 const (

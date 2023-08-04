@@ -36,3 +36,32 @@ func TestParseProgram(t *testing.T) {
 		assert.Equal(t, 3, len(program.Stmts))
 	}
 }
+
+func TestParseLiteral(t *testing.T) {
+	input := `
+	true;
+	false;
+	100;
+	`
+	l := lexer.NewLexer(input)
+	tokenList := make([]*tokens.Token, 0, 1)
+	for {
+		tk, err := l.NextToken()
+		if err != nil {
+			break
+		}
+
+		tokenList = append(tokenList, tk)
+		if tk.TkType == tokens.EOF {
+			break
+		}
+	}
+
+	p := NewParser(tokenList)
+	if assert.NotNil(t, p) {
+		program, err := p.ParseProgram()
+		assert.Nil(t, err)
+		assert.NotNil(t, program)
+		assert.Equal(t, 3, len(program.Stmts))
+	}
+}
