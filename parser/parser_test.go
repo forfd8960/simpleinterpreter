@@ -5,6 +5,7 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
+	"github.com/forfd8960/simpleinterpreter/ast"
 	"github.com/forfd8960/simpleinterpreter/lexer"
 	"github.com/forfd8960/simpleinterpreter/tokens"
 )
@@ -62,6 +63,32 @@ func TestParseLiteral(t *testing.T) {
 		program, err := p.ParseProgram()
 		assert.Nil(t, err)
 		assert.NotNil(t, program)
-		assert.Equal(t, 3, len(program.Stmts))
+
+		if assert.Equal(t, 3, len(program.Stmts)) {
+			assert.Equal(t,
+				ast.NewExpressionStmt(ast.NewLiteral(tokens.NewToken(
+					tokens.TRUE,
+					"true",
+					true,
+				))),
+				program.Stmts[0],
+			)
+			assert.Equal(t,
+				ast.NewExpressionStmt(ast.NewLiteral(tokens.NewToken(
+					tokens.FALSE,
+					"false",
+					false,
+				))),
+				program.Stmts[1],
+			)
+			assert.Equal(t,
+				ast.NewExpressionStmt(ast.NewLiteral(tokens.NewToken(
+					tokens.INTEGER,
+					"100",
+					int64(100),
+				))),
+				program.Stmts[2],
+			)
+		}
 	}
 }

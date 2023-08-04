@@ -37,7 +37,7 @@ primary        → NUMBER | STRING | "true" | "false" | "nil"
 */
 func (p *Parser) ParseProgram() (*ast.Program, error) {
 	program := &ast.Program{
-		Stmts: make([]ast.Stmt, 1),
+		Stmts: make([]ast.Stmt, 0, 1),
 	}
 
 	for !p.isAtEnd() {
@@ -60,9 +60,9 @@ func (p *Parser) declaration() (ast.Stmt, error) {
 		return p.parseLetStmt()
 	case p.match(tokens.FUNCTION):
 		return p.function()
+	default:
+		return p.statement()
 	}
-
-	return p.statement()
 }
 
 func (p *Parser) parseLetStmt() (ast.Stmt, error) {

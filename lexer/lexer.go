@@ -167,7 +167,13 @@ func (l *Lexer) parseIdent() *tokens.Token {
 	}
 
 	ident := string(l.runes[l.start:l.current])
-	return tokens.NewToken(tokens.LookupIdent(ident), ident, ident)
+	tkType := tokens.LookupIdent(ident)
+	tk := tokens.LookupTokenByIdent(ident)
+	if tk == nil {
+		tk = tokens.NewToken(tkType, ident, ident)
+	}
+
+	return tk
 }
 
 func (l *Lexer) match(r rune) bool {
