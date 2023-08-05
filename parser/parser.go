@@ -175,7 +175,63 @@ func (p *Parser) statement() (ast.Stmt, error) {
 }
 
 func (p *Parser) forStatement() (ast.Stmt, error) {
-	return nil, nil
+	p.consume(tokens.LPRARENT, "Expect `(` after for.")
+
+	var initializer ast.Stmt
+	var err error
+
+	if p.match(tokens.SEMICOLON) {
+		initializer = nil
+	} else if p.match(tokens.LET) {
+		initializer, err = p.parseLetStmt()
+	} else {
+		initializer, err = p.expressionStatement()
+	}
+	if err != nil {
+		return nil, err
+	}
+
+	var cond ast.Expression
+	if !p.check(tokens.SEMICOLON) {
+		cond, err = p.parseExpr()
+		if err != nil {
+			return nil, err
+		}
+	}
+	if _, err := p.consume(tokens.SEMICOLON, "Expect `;` after loop condition."); err != nil {
+		return nil, err
+	}
+
+	var increment ast.Expression
+	if !p.check(tokens.SEMICOLON) {
+		increment, err = p.parseExpr()
+		if err != nil {
+			return nil, err
+		}
+	}
+	if _, err = p.consume(tokens.RPARENT, "Expect `)` after for clauses."); err != nil {
+		return nil, err
+	}
+
+	body, err := p.statement()
+	if err != nil {
+		return nil, err
+	}
+
+	if increment != nil {
+		body = ast.NewBlockStmt([]ast.Stmt{body, ast.NewExpressionStmt(increment)})
+	}
+
+	if cond == nil {
+		cond = ast.NewLiteral(tokens.NewToken(tokens.TRUE, "true", true))
+	}
+	body = ast.NewWhileStmt(cond, body)
+
+	if initializer != nil {
+		body = ast.NewBlockStmt([]ast.Stmt{initializer, body})
+	}
+
+	return body, nil
 }
 
 func (p *Parser) ifStatement() (ast.Stmt, error) {

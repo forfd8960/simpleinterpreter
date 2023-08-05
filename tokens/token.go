@@ -37,6 +37,11 @@ var keyword2Token = map[string]*Token{
 		Literal: "for",
 		Value:   "for",
 	},
+	"while": {
+		TkType:  WHILE,
+		Literal: "while",
+		Value:   "while",
+	},
 	"else": {
 		TkType:  ELSE,
 		Literal: "else",
