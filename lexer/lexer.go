@@ -23,7 +23,6 @@ type Lexer struct {
 	runes   []rune
 	start   int // current index in input
 	current int // current read index in input after pos
-	char    rune
 }
 
 func NewLexer(input string) *Lexer {
@@ -31,6 +30,24 @@ func NewLexer(input string) *Lexer {
 		input: input,
 		runes: []rune(input),
 	}
+}
+
+func TokensFromInput(input string) ([]*tokens.Token, error) {
+	l := NewLexer(input)
+	tokenList := make([]*tokens.Token, 0, 1)
+	for {
+		tk, err := l.NextToken()
+		if err != nil {
+			return nil, err
+		}
+
+		tokenList = append(tokenList, tk)
+		if tk.TkType == tokens.EOF {
+			break
+		}
+	}
+
+	return tokenList, nil
 }
 
 func (l *Lexer) NextToken() (*tokens.Token, error) {
@@ -71,9 +88,9 @@ func (l *Lexer) scanToken() (*tokens.Token, error) {
 	case '!':
 		tok = CondExp(l.match('='), l.buildToken(tokens.NOTEQUAL, "!="), l.buildToken(tokens.BANG, "!"))
 	case '<':
-		tok = l.buildToken(tokens.LT, "<")
+		tok = CondExp(l.match('='), l.buildToken(tokens.LTEQ, "<="), l.buildToken(tokens.LT, "<"))
 	case '>':
-		tok = l.buildToken(tokens.GT, "<")
+		tok = CondExp(l.match('='), l.buildToken(tokens.GTEQ, ">="), l.buildToken(tokens.GT, ">"))
 	case '(':
 		tok = l.buildToken(tokens.LPRARENT, "(")
 	case ')':

@@ -22,37 +22,47 @@ var keyword2Token = map[string]*Token{
 		Literal: "let",
 		Value:   "let",
 	},
-	"fn": &Token{
+	"fn": {
 		TkType:  FUNCTION,
 		Literal: "fn",
 		Value:   "function",
 	},
-	"if": &Token{
+	"if": {
 		TkType:  IF,
-		Literal: "fn",
-		Value:   "function",
+		Literal: "if",
+		Value:   "if",
 	},
-	"else": &Token{
+	"for": {
+		TkType:  FOR,
+		Literal: "for",
+		Value:   "for",
+	},
+	"else": {
 		TkType:  ELSE,
-		Literal: "fn",
-		Value:   "function",
+		Literal: "else",
+		Value:   "else",
 	},
-	"return": &Token{
+	"return": {
 		TkType:  RETURN,
 		Literal: "return",
 		Value:   "return",
 	},
-	"true": &Token{
+	"print": {
+		TkType:  PRINT,
+		Literal: "print",
+		Value:   "print",
+	},
+	"true": {
 		TkType:  TRUE,
 		Literal: "true",
 		Value:   true,
 	},
-	"false": &Token{
+	"false": {
 		TkType:  FALSE,
 		Literal: "false",
 		Value:   false,
 	},
-	"nil": &Token{
+	"nil": {
 		TkType:  NIL,
 		Literal: "nil",
 		Value:   nil,

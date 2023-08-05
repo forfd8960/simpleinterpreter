@@ -59,3 +59,45 @@ func (fn *Function) TokenLiteral() string {
 func NewFunctionStmt(name *tokens.Token, params []*tokens.Token, body []Stmt) *Function {
 	return &Function{Name: name, Parameters: params, Body: body}
 }
+
+type IFStmt struct {
+	Condition  Expression
+	ThenBranch Stmt
+	ElseBranch Stmt
+}
+
+func NewIFStmt(cond Expression, thenBranch, elseBranch Stmt) *IFStmt {
+	return &IFStmt{Condition: cond, ThenBranch: thenBranch, ElseBranch: elseBranch}
+}
+
+func (ift *IFStmt) StmtNode() {}
+func (ift *IFStmt) TokenLiteral() string {
+	return "if"
+}
+
+type PrintStmt struct {
+	value Expression
+}
+
+func NewPrintStmt(e Expression) *PrintStmt {
+	return &PrintStmt{value: e}
+}
+
+func (pt *PrintStmt) StmtNode() {}
+func (pt *PrintStmt) TokenLiteral() string {
+	return "print"
+}
+
+type WhileStmt struct {
+	Condition Expression
+	Body      Stmt
+}
+
+func NewWhileStmt(cond Expression, body Stmt) *WhileStmt {
+	return &WhileStmt{Condition: cond, Body: body}
+}
+
+func (w *WhileStmt) StmtNode() {}
+func (w *WhileStmt) TokenLiteral() string {
+	return "while"
+}
