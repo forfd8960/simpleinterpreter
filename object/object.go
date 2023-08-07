@@ -37,6 +37,18 @@ func (b *Bool) Type() ObjectType {
 	return OBJ_BOOL
 }
 
+type String struct {
+	Value string
+}
+
+func (s *String) Inspect() string {
+	return s.Value
+}
+
+func (s *String) Type() ObjectType {
+	return OBJ_STRING
+}
+
 type Null struct{}
 
 func (n *Null) Inspect() string {
