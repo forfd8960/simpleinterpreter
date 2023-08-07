@@ -5,8 +5,9 @@ import (
 	"fmt"
 	"io"
 
+	"github.com/forfd8960/simpleinterpreter/eval"
 	"github.com/forfd8960/simpleinterpreter/lexer"
-	"github.com/forfd8960/simpleinterpreter/tokens"
+	"github.com/forfd8960/simpleinterpreter/parser"
 )
 
 const PROMT = ">>%s"
@@ -22,23 +23,25 @@ func Start(in io.Reader, out io.Writer) {
 		}
 
 		text := scanner.Text()
-		lxer := lexer.NewLexer(text)
-
-		var tok *tokens.Token
-		var err error
-
-		for {
-			tok, err = lxer.NextToken()
-			if err != nil {
-				fmt.Println(err)
-				break
-			}
-
-			fmt.Printf("%+v\n", tok)
-
-			if tok.TkType == tokens.EOF {
-				break
-			}
+		tokens, err := lexer.TokensFromInput(text)
+		if err != nil {
+			fmt.Println("lexer err: ", err)
+			continue
 		}
+
+		p := parser.NewParser(tokens)
+		program, err := p.ParseProgram()
+		if err != nil {
+			fmt.Println("lexer err: ", err)
+			continue
+		}
+
+		result, err := eval.Eval(program)
+		if err != nil {
+			fmt.Println("lexer err: ", err)
+			continue
+		}
+
+		fmt.Printf("eval result: %v\n", result)
 	}
 }

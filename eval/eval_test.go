@@ -1,6 +1,8 @@
 package eval
 
 import (
+	"fmt"
+	"reflect"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -45,6 +47,74 @@ func TestEval(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			obj, err := Eval(tt.args.input)
+			assert.Nil(t, err)
+			assert.Equal(t, tt.want, obj)
+		})
+	}
+}
+
+func TestEval1(t *testing.T) {
+	type args struct {
+		input ast.Node
+	}
+	tests := []struct {
+		name    string
+		args    args
+		want    object.Object
+		wantErr bool
+	}{
+		{
+			name: "eval integer",
+			args: args{
+				input: &ast.Program{
+					Stmts: []ast.Stmt{
+						&ast.ExpressionStmt{
+							Expr: ast.NewLiteral(tokens.NewToken(tokens.INTEGER, "64", int64(64))),
+						},
+					},
+				},
+			},
+			want: &object.Integrer{Value: 64},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			obj, err := Eval(tt.args.input)
+			fmt.Printf("%+v\n", obj)
+			fmt.Printf("type: %+v\n", reflect.TypeOf(obj))
+			assert.Nil(t, err)
+			assert.Equal(t, tt.want, obj)
+		})
+	}
+}
+
+func TestEvalBinary(t *testing.T) {
+	type args struct {
+		input ast.Node
+	}
+	tests := []struct {
+		name    string
+		args    args
+		want    object.Object
+		wantErr bool
+	}{
+		{
+			name: "eval integer",
+			args: args{
+				input: ast.NewBinary(
+					ast.NewLiteral(tokens.NewToken(tokens.INTEGER, "64", int64(64))),
+					ast.NewLiteral(tokens.NewToken(tokens.INTEGER, "64", int64(64))),
+					tokens.NewToken(tokens.PLUS, "+", "+"),
+				),
+			},
+			want: &object.Integrer{Value: 128},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			obj, err := Eval(tt.args.input)
+			fmt.Printf("%+v\n", obj)
+			fmt.Printf("type: %+v\n", reflect.TypeOf(obj))
 			assert.Nil(t, err)
 			assert.Equal(t, tt.want, obj)
 		})

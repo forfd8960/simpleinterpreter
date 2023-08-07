@@ -9,10 +9,11 @@ import (
 )
 
 var (
-	ErrNodeNotLiteral  = "node: %v is not literal"
-	ErrNotIntegerValue = "value: %v is not integer"
-	ErrNotBoolValue    = "value: %v is not boolean"
-	ErrNotStringValue  = "value: %v is not string"
+	ErrNodeNotLiteral       = "node: %v is not literal"
+	ErrNotIntegerValue      = "value: %v is not integer"
+	ErrNotBoolValue         = "value: %v is not boolean"
+	ErrNotStringValue       = "value: %v is not string"
+	ErrNotSupportedOperator = "operator is not supported: %v"
 )
 
 func Eval(node ast.Node) (object.Object, error) {
@@ -23,6 +24,8 @@ func Eval(node ast.Node) (object.Object, error) {
 		return Eval(v.Expr)
 	case *ast.Literal:
 		return evalLiteral(v)
+	case *ast.Binary:
+		return evalBinary(v)
 	}
 
 	return nil, nil
@@ -54,6 +57,33 @@ func evalLiteral(literal *ast.Literal) (object.Object, error) {
 	}
 
 	return nil, fmt.Errorf(ErrNodeNotLiteral, value)
+}
+
+func evalBinary(bin *ast.Binary) (object.Object, error) {
+	leftResult, err := Eval(bin.Left)
+	if err != nil {
+		return nil, err
+	}
+	rightResult, err := Eval(bin.Right)
+	if err != nil {
+		return nil, err
+	}
+
+	leftValue := leftResult.(*object.Integrer)
+	rightValue := rightResult.(*object.Integrer)
+
+	switch bin.Operator.TkType {
+	case tokens.PLUS:
+		return &object.Integrer{Value: leftValue.Value + rightValue.Value}, nil
+	case tokens.MINUS:
+		return &object.Integrer{Value: leftValue.Value - rightValue.Value}, nil
+	case tokens.ASTERISK:
+		return &object.Integrer{Value: leftValue.Value * rightValue.Value}, nil
+	case tokens.SLASH:
+		return &object.Integrer{Value: leftValue.Value / rightValue.Value}, nil
+	}
+
+	return nil, fmt.Errorf(ErrNotSupportedOperator, bin.Operator.Literal)
 }
 
 func evalLiteralInteger(value interface{}) (*object.Integrer, error) {
