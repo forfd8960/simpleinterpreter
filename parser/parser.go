@@ -489,7 +489,6 @@ func (p *Parser) primary() (ast.Expression, error) {
 			return nil, err
 		}
 		return ast.NewGrouping(exp), nil
-
 	}
 
 	return nil, fmt.Errorf("unknow expr")
