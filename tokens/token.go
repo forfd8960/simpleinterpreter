@@ -13,7 +13,7 @@ var keywords = map[string]TokenType{
 	"return": RETURN,
 	"true":   TRUE,
 	"false":  FALSE,
-	"nil":    NIL,
+	"null":   NIL,
 }
 
 var keyword2Token = map[string]*Token{
@@ -67,9 +67,9 @@ var keyword2Token = map[string]*Token{
 		Literal: "false",
 		Value:   false,
 	},
-	"nil": {
+	"null": {
 		TkType:  NIL,
-		Literal: "nil",
+		Literal: "null",
 		Value:   nil,
 	},
 }

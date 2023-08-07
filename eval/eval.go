@@ -17,11 +17,27 @@ var (
 
 func Eval(node ast.Node) (object.Object, error) {
 	switch v := node.(type) {
+	case *ast.Program:
+		return evalStatements(v.Stmts)
+	case *ast.ExpressionStmt:
+		return Eval(v.Expr)
 	case *ast.Literal:
 		return evalLiteral(v)
 	}
 
 	return nil, nil
+}
+
+func evalStatements(nodes []ast.Stmt) (object.Object, error) {
+	var result object.Object
+	var err error
+	for _, stmt := range nodes {
+		result, err = Eval(stmt)
+		if err != nil {
+			return nil, err
+		}
+	}
+	return result, nil
 }
 
 func evalLiteral(literal *ast.Literal) (object.Object, error) {
