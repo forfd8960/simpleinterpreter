@@ -116,6 +116,39 @@ func TestEvalBinary(t *testing.T) {
 			},
 			want: &object.Integer{Value: 128},
 		},
+		{
+			name: "eval compare",
+			args: args{
+				input: ast.NewBinary(
+					ast.NewLiteral(tokens.NewToken(tokens.INTEGER, "64", int64(64))),
+					ast.NewLiteral(tokens.NewToken(tokens.INTEGER, "64", int64(64))),
+					tokens.NewToken(tokens.EQUAL, "==", "=="),
+				),
+			},
+			want: &object.Bool{Value: true},
+		},
+		{
+			name: "eval compare string",
+			args: args{
+				input: ast.NewBinary(
+					ast.NewLiteral(tokens.NewToken(tokens.STRING, "Hello", "Hello")),
+					ast.NewLiteral(tokens.NewToken(tokens.STRING, "Hello", "Hello")),
+					tokens.NewToken(tokens.EQUAL, "==", "=="),
+				),
+			},
+			want: &object.Bool{Value: true},
+		},
+		{
+			name: "eval compare string",
+			args: args{
+				input: ast.NewBinary(
+					ast.NewLiteral(tokens.NewToken(tokens.STRING, "abc", "abc")),
+					ast.NewLiteral(tokens.NewToken(tokens.STRING, "ABC", "ABC")),
+					tokens.NewToken(tokens.GT, ">", ">"),
+				),
+			},
+			want: &object.Bool{Value: true},
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -184,4 +217,11 @@ func TestEvalUnary(t *testing.T) {
 			}
 		})
 	}
+}
+
+func TestStringCompare(t *testing.T) {
+	s1 := "abc"
+	s2 := "ABC"
+	fmt.Printf("%t\n", s1 > s2)
+	assert.True(t, s1 > s2)
 }

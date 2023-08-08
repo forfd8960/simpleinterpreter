@@ -20,6 +20,10 @@ func Eval(node ast.Node) (object.Object, error) {
 	switch v := node.(type) {
 	case *ast.Program:
 		return evalStatements(v.Stmts)
+	case *ast.Block:
+		return evalBockStmts(v)
+	case *ast.IFStmt:
+		return evalIfStmt(v)
 	case *ast.ExpressionStmt:
 		return Eval(v.Expr)
 	case *ast.Literal:
@@ -43,6 +47,38 @@ func evalStatements(nodes []ast.Stmt) (object.Object, error) {
 		}
 	}
 	return result, nil
+}
+
+func evalBockStmts(b *ast.Block) (object.Object, error) {
+	var obj object.Object
+	var err error
+	for _, stmt := range b.Statements {
+		obj, err = Eval(stmt)
+		if err != nil {
+			return nil, err
+		}
+	}
+
+	return obj, nil
+}
+
+func evalIfStmt(v *ast.IFStmt) (object.Object, error) {
+	cond, err := Eval(v.Condition)
+	if err != nil {
+		return nil, err
+	}
+	truth, ok := cond.(*object.Bool)
+	if !ok {
+		return nil, fmt.Errorf("bad if condition: %v", cond)
+	}
+
+	if truth.Value {
+		return Eval(v.ThenBranch)
+	} else if v.ElseBranch != nil {
+		return Eval(v.ElseBranch)
+	} else {
+		return nil, nil
+	}
 }
 
 func evalLiteral(literal *ast.Literal) (object.Object, error) {
