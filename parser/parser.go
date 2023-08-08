@@ -402,7 +402,7 @@ func (p *Parser) comparison() (ast.Expression, error) {
 		return nil, err
 	}
 
-	for p.match(tokens.GT, tokens.GT, tokens.LT, tokens.LTEQ) {
+	for p.match(tokens.GT, tokens.GTEQ, tokens.LT, tokens.LTEQ, tokens.EQUAL, tokens.NOTEQUAL) {
 		op := p.previous()
 		right, err := p.term()
 		if err != nil {

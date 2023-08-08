@@ -9,14 +9,14 @@ type Object interface {
 	Inspect() string
 }
 
-type Integrer struct {
+type Integer struct {
 	Value int64
 }
 
-func (i *Integrer) Inspect() string {
+func (i *Integer) Inspect() string {
 	return strconv.FormatInt(i.Value, 10)
 }
-func (i *Integrer) Type() ObjectType {
+func (i *Integer) Type() ObjectType {
 	return OBJ_INTEGER
 }
 

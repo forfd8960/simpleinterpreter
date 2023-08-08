@@ -71,21 +71,86 @@ func evalBinary(bin *ast.Binary) (object.Object, error) {
 		return nil, err
 	}
 
-	leftValue := leftResult.(*object.Integrer)
-	rightValue := rightResult.(*object.Integrer)
+	op := bin.Operator.TkType
 
-	switch bin.Operator.TkType {
-	case tokens.PLUS:
-		return &object.Integrer{Value: leftValue.Value + rightValue.Value}, nil
-	case tokens.MINUS:
-		return &object.Integrer{Value: leftValue.Value - rightValue.Value}, nil
-	case tokens.ASTERISK:
-		return &object.Integrer{Value: leftValue.Value * rightValue.Value}, nil
-	case tokens.SLASH:
-		return &object.Integrer{Value: leftValue.Value / rightValue.Value}, nil
+	switch op {
+	case tokens.GT, tokens.GTEQ, tokens.LT, tokens.LTEQ, tokens.NOTEQUAL, tokens.EQUAL:
+		resul, err := compareObj(leftResult, rightResult, op)
+		return &object.Bool{Value: resul}, err
+	default:
+		leftValue := leftResult.(*object.Integer)
+		rightValue := rightResult.(*object.Integer)
+		switch op {
+		case tokens.PLUS:
+			return &object.Integer{Value: leftValue.Value + rightValue.Value}, nil
+		case tokens.MINUS:
+			return &object.Integer{Value: leftValue.Value - rightValue.Value}, nil
+		case tokens.ASTERISK:
+			return &object.Integer{Value: leftValue.Value * rightValue.Value}, nil
+		case tokens.SLASH:
+			return &object.Integer{Value: leftValue.Value / rightValue.Value}, nil
+		}
+
 	}
 
 	return nil, fmt.Errorf(ErrNotSupportedOperator, bin.Operator.Literal)
+}
+
+func compareObj(obj1, obj2 object.Object, op tokens.TokenType) (bool, error) {
+	if obj1.Type() != obj2.Type() {
+		return false, fmt.Errorf("can not compare 2 different type: %v, %v", obj1, obj2)
+	}
+
+	switch obj1.Type() {
+	case object.OBJ_INTEGER:
+		left, _ := obj1.(*object.Integer)
+		right, _ := obj2.(*object.Integer)
+		return compareInteger(left.Value, right.Value, op), nil
+	case object.OBJ_STRING:
+		left, _ := obj1.(*object.String)
+		right, _ := obj2.(*object.String)
+		return compareString(left.Value, right.Value, op), nil
+	}
+
+	return false, fmt.Errorf("unsupported compare type:  %v, %v", obj1, obj2)
+}
+
+func compareInteger(v1, v2 int64, op tokens.TokenType) bool {
+	switch op {
+	case tokens.GT:
+		return v1 > v2
+	case tokens.GTEQ:
+		return v1 >= v2
+	case tokens.LT:
+		return v1 < v2
+	case tokens.LTEQ:
+		return v1 <= v2
+	case tokens.NOTEQUAL:
+		return v1 != v2
+	case tokens.EQUAL:
+		return v1 == v2
+	}
+
+	return false
+}
+
+func compareString(v1, v2 string, op tokens.TokenType) bool {
+	switch op {
+	case tokens.GT:
+		return v1 > v2
+	case tokens.GTEQ:
+		return v1 >= v2
+	case tokens.LT:
+		return v1 < v2
+	case tokens.LTEQ:
+		return v1 <= v2
+	case tokens.NOTEQUAL:
+		return v1 != v2
+	case tokens.EQUAL:
+		return v1 == v2
+	}
+
+	return false
 }
 
 func evalUnary(node *ast.Unary) (object.Object, error) {
@@ -103,22 +168,22 @@ func evalUnary(node *ast.Unary) (object.Object, error) {
 		}
 		return &object.Bool{Value: !v.Value}, nil
 	case tokens.MINUS:
-		v, ok := obj.(*object.Integrer)
+		v, ok := obj.(*object.Integer)
 		if !ok {
 			return nil, fmt.Errorf("right value must be integer: %v", obj)
 		}
-		return &object.Integrer{Value: -v.Value}, nil
+		return &object.Integer{Value: -v.Value}, nil
 	}
 
 	return nil, fmt.Errorf("unsupported unary Operator: %v", op)
 }
 
-func evalLiteralInteger(value interface{}) (*object.Integrer, error) {
+func evalLiteralInteger(value interface{}) (*object.Integer, error) {
 	v, ok := value.(int64)
 	if !ok {
 		return nil, fmt.Errorf(ErrNotIntegerValue, value)
 	}
-	return &object.Integrer{Value: v}, nil
+	return &object.Integer{Value: v}, nil
 }
 
 func evalLiteralBool(value interface{}) (*object.Bool, error) {

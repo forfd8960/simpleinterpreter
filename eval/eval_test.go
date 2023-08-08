@@ -27,7 +27,7 @@ func TestEval(t *testing.T) {
 			args: args{
 				input: ast.NewLiteral(tokens.NewToken(tokens.INTEGER, "64", int64(64))),
 			},
-			want: &object.Integrer{Value: 64},
+			want: &object.Integer{Value: 64},
 		},
 		{
 			name: "eval bool",
@@ -81,7 +81,7 @@ func TestEval1(t *testing.T) {
 					},
 				},
 			},
-			want: &object.Integrer{Value: 64},
+			want: &object.Integer{Value: 64},
 		},
 	}
 	for _, tt := range tests {
@@ -114,7 +114,7 @@ func TestEvalBinary(t *testing.T) {
 					tokens.NewToken(tokens.PLUS, "+", "+"),
 				),
 			},
-			want: &object.Integrer{Value: 128},
+			want: &object.Integer{Value: 128},
 		},
 	}
 	for _, tt := range tests {
@@ -156,7 +156,7 @@ func TestEvalUnary(t *testing.T) {
 					ast.NewLiteral(tokens.NewToken(tokens.INTEGER, "10", int64(10))),
 				),
 			},
-			want: &object.Integrer{Value: -10},
+			want: &object.Integer{Value: -10},
 		},
 		{
 			name: "eval unary err",
