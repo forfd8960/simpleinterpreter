@@ -26,6 +26,8 @@ func Eval(node ast.Node) (object.Object, error) {
 		return evalLiteral(v)
 	case *ast.Binary:
 		return evalBinary(v)
+	case *ast.Unary:
+		return evalUnary(v)
 	}
 
 	return nil, nil
@@ -84,6 +86,31 @@ func evalBinary(bin *ast.Binary) (object.Object, error) {
 	}
 
 	return nil, fmt.Errorf(ErrNotSupportedOperator, bin.Operator.Literal)
+}
+
+func evalUnary(node *ast.Unary) (object.Object, error) {
+	op := node.Operator
+	obj, err := Eval(node.Right)
+	if err != nil {
+		return nil, err
+	}
+
+	switch op.TkType {
+	case tokens.BANG:
+		v, ok := obj.(*object.Bool)
+		if !ok {
+			return nil, fmt.Errorf("right value must be boolean: %v", obj)
+		}
+		return &object.Bool{Value: !v.Value}, nil
+	case tokens.MINUS:
+		v, ok := obj.(*object.Integrer)
+		if !ok {
+			return nil, fmt.Errorf("right value must be integer: %v", obj)
+		}
+		return &object.Integrer{Value: -v.Value}, nil
+	}
+
+	return nil, fmt.Errorf("unsupported unary Operator: %v", op)
 }
 
 func evalLiteralInteger(value interface{}) (*object.Integrer, error) {
