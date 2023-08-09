@@ -64,6 +64,10 @@ func evalBockStmts(b *ast.Block) (object.Object, error) {
 		if err != nil {
 			return nil, err
 		}
+
+		if obj != nil && obj.Type() == object.OBJ_RETURN {
+			return obj, nil
+		}
 	}
 
 	return obj, nil
@@ -157,52 +161,14 @@ func compareObj(obj1, obj2 object.Object, op tokens.TokenType) (bool, error) {
 	case object.OBJ_INTEGER:
 		left, _ := obj1.(*object.Integer)
 		right, _ := obj2.(*object.Integer)
-		return compareInteger(left.Value, right.Value, op), nil
+		return left.Compare(op, right), nil
 	case object.OBJ_STRING:
 		left, _ := obj1.(*object.String)
 		right, _ := obj2.(*object.String)
-		return compareString(left.Value, right.Value, op), nil
+		return left.Compare(op, right), nil
 	}
 
-	return false, fmt.Errorf("unsupported compare type:  %v, %v", obj1, obj2)
-}
-
-func compareInteger(v1, v2 int64, op tokens.TokenType) bool {
-	switch op {
-	case tokens.GT:
-		return v1 > v2
-	case tokens.GTEQ:
-		return v1 >= v2
-	case tokens.LT:
-		return v1 < v2
-	case tokens.LTEQ:
-		return v1 <= v2
-	case tokens.NOTEQUAL:
-		return v1 != v2
-	case tokens.EQUAL:
-		return v1 == v2
-	}
-
-	return false
-}
-
-func compareString(v1, v2 string, op tokens.TokenType) bool {
-	switch op {
-	case tokens.GT:
-		return v1 > v2
-	case tokens.GTEQ:
-		return v1 >= v2
-	case tokens.LT:
-		return v1 < v2
-	case tokens.LTEQ:
-		return v1 <= v2
-	case tokens.NOTEQUAL:
-		return v1 != v2
-	case tokens.EQUAL:
-		return v1 == v2
-	}
-
-	return false
+	return false, fmt.Errorf("unsupported compare type:  %v, %v", obj1.Type(), obj2.Type())
 }
 
 func evalUnary(node *ast.Unary) (object.Object, error) {
