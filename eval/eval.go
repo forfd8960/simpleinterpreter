@@ -24,6 +24,8 @@ func Eval(node ast.Node) (object.Object, error) {
 		return evalBockStmts(v)
 	case *ast.IFStmt:
 		return evalIfStmt(v)
+	case *ast.ReturnStmt:
+		return evalReturn(v)
 	case *ast.ExpressionStmt:
 		return Eval(v.Expr)
 	case *ast.Literal:
@@ -42,6 +44,11 @@ func evalStatements(nodes []ast.Stmt) (object.Object, error) {
 	var err error
 	for _, stmt := range nodes {
 		result, err = Eval(stmt)
+
+		if ret, ok := result.(*object.Return); ok {
+			return ret.Value, nil
+		}
+
 		if err != nil {
 			return nil, err
 		}
@@ -79,6 +86,15 @@ func evalIfStmt(v *ast.IFStmt) (object.Object, error) {
 	} else {
 		return nil, nil
 	}
+}
+
+func evalReturn(v *ast.ReturnStmt) (object.Object, error) {
+	result, err := Eval(v.Value)
+	if err != nil {
+		return nil, err
+	}
+
+	return &object.Return{Value: result}, nil
 }
 
 func evalLiteral(literal *ast.Literal) (object.Object, error) {

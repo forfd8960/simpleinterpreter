@@ -1,6 +1,8 @@
 package object
 
-import "strconv"
+import (
+	"strconv"
+)
 
 type ObjectType string
 
@@ -56,4 +58,15 @@ func (n *Null) Inspect() string {
 }
 func (n *Null) Type() ObjectType {
 	return OBJ_NULL
+}
+
+type Return struct {
+	Value Object
+}
+
+func (ret *Return) Inspect() string {
+	return "return"
+}
+func (ret *Return) Type() ObjectType {
+	return OBJ_RETURN
 }
