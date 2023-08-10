@@ -16,6 +16,8 @@ func TestEval(t *testing.T) {
 	type args struct {
 		input ast.Node
 	}
+
+	env := object.NewEnvironment()
 	tests := []struct {
 		name    string
 		args    args
@@ -53,7 +55,7 @@ func TestEval(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			obj, err := Eval(tt.args.input)
+			obj, err := Eval(tt.args.input, env)
 			assert.Nil(t, err)
 			assert.Equal(t, tt.want, obj)
 		})
@@ -64,6 +66,9 @@ func TestEval1(t *testing.T) {
 	type args struct {
 		input ast.Node
 	}
+
+	env := object.NewEnvironment()
+
 	tests := []struct {
 		name    string
 		args    args
@@ -86,7 +91,7 @@ func TestEval1(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			obj, err := Eval(tt.args.input)
+			obj, err := Eval(tt.args.input, env)
 			fmt.Printf("%+v\n", obj)
 			fmt.Printf("type: %+v\n", reflect.TypeOf(obj))
 			assert.Nil(t, err)
@@ -150,9 +155,10 @@ func TestEvalBinary(t *testing.T) {
 			want: &object.Bool{Value: true},
 		},
 	}
+	env := object.NewEnvironment()
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			obj, err := Eval(tt.args.input)
+			obj, err := Eval(tt.args.input, env)
 			fmt.Printf("%+v\n", obj)
 			fmt.Printf("type: %+v\n", reflect.TypeOf(obj))
 			assert.Nil(t, err)
@@ -203,9 +209,11 @@ func TestEvalUnary(t *testing.T) {
 			want:    nil,
 		},
 	}
+
+	env := object.NewEnvironment()
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			obj, err := Eval(tt.args.input)
+			obj, err := Eval(tt.args.input, env)
 			fmt.Printf("obj: %v, err: %v\n", obj, err)
 			if tt.wantErr {
 				assert.NotNil(t, err)
@@ -275,9 +283,11 @@ func TestEvalReturn(t *testing.T) {
 			want:    &object.Return{Value: &object.String{Value: "hello"}},
 		},
 	}
+	env := object.NewEnvironment()
+
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			obj, err := Eval(tt.args.input)
+			obj, err := Eval(tt.args.input, env)
 			fmt.Printf("obj: %+v, err: %v\n", obj, err)
 			fmt.Printf("obj type: %+v\n", reflect.ValueOf(obj).String())
 

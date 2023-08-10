@@ -16,34 +16,34 @@ var (
 	ErrNotSupportedOperator = "operator is not supported: %v"
 )
 
-func Eval(node ast.Node) (object.Object, error) {
+func Eval(node ast.Node, env *object.Environment) (object.Object, error) {
 	switch v := node.(type) {
 	case *ast.Program:
-		return evalStatements(v.Stmts)
+		return evalStatements(v.Stmts, env)
 	case *ast.Block:
-		return evalBockStmts(v)
+		return evalBockStmts(v, env)
 	case *ast.IFStmt:
-		return evalIfStmt(v)
+		return evalIfStmt(v, env)
 	case *ast.ReturnStmt:
-		return evalReturn(v)
+		return evalReturn(v, env)
 	case *ast.ExpressionStmt:
-		return Eval(v.Expr)
+		return Eval(v.Expr, env)
 	case *ast.Literal:
 		return evalLiteral(v)
 	case *ast.Binary:
-		return evalBinary(v)
+		return evalBinary(v, env)
 	case *ast.Unary:
-		return evalUnary(v)
+		return evalUnary(v, env)
 	}
 
 	return nil, nil
 }
 
-func evalStatements(nodes []ast.Stmt) (object.Object, error) {
+func evalStatements(nodes []ast.Stmt, env *object.Environment) (object.Object, error) {
 	var result object.Object
 	var err error
 	for _, stmt := range nodes {
-		result, err = Eval(stmt)
+		result, err = Eval(stmt, env)
 
 		if ret, ok := result.(*object.Return); ok {
 			return ret.Value, nil
@@ -56,11 +56,11 @@ func evalStatements(nodes []ast.Stmt) (object.Object, error) {
 	return result, nil
 }
 
-func evalBockStmts(b *ast.Block) (object.Object, error) {
+func evalBockStmts(b *ast.Block, env *object.Environment) (object.Object, error) {
 	var obj object.Object
 	var err error
 	for _, stmt := range b.Statements {
-		obj, err = Eval(stmt)
+		obj, err = Eval(stmt, env)
 		if err != nil {
 			return nil, err
 		}
@@ -73,8 +73,8 @@ func evalBockStmts(b *ast.Block) (object.Object, error) {
 	return obj, nil
 }
 
-func evalIfStmt(v *ast.IFStmt) (object.Object, error) {
-	cond, err := Eval(v.Condition)
+func evalIfStmt(v *ast.IFStmt, env *object.Environment) (object.Object, error) {
+	cond, err := Eval(v.Condition, env)
 	if err != nil {
 		return nil, err
 	}
@@ -84,16 +84,16 @@ func evalIfStmt(v *ast.IFStmt) (object.Object, error) {
 	}
 
 	if truth.Value {
-		return Eval(v.ThenBranch)
+		return Eval(v.ThenBranch, env)
 	} else if v.ElseBranch != nil {
-		return Eval(v.ElseBranch)
+		return Eval(v.ElseBranch, env)
 	} else {
 		return nil, nil
 	}
 }
 
-func evalReturn(v *ast.ReturnStmt) (object.Object, error) {
-	result, err := Eval(v.Value)
+func evalReturn(v *ast.ReturnStmt, env *object.Environment) (object.Object, error) {
+	result, err := Eval(v.Value, env)
 	if err != nil {
 		return nil, err
 	}
@@ -117,12 +117,12 @@ func evalLiteral(literal *ast.Literal) (object.Object, error) {
 	return nil, fmt.Errorf(ErrNodeNotLiteral, value)
 }
 
-func evalBinary(bin *ast.Binary) (object.Object, error) {
-	leftResult, err := Eval(bin.Left)
+func evalBinary(bin *ast.Binary, env *object.Environment) (object.Object, error) {
+	leftResult, err := Eval(bin.Left, env)
 	if err != nil {
 		return nil, err
 	}
-	rightResult, err := Eval(bin.Right)
+	rightResult, err := Eval(bin.Right, env)
 	if err != nil {
 		return nil, err
 	}
@@ -171,9 +171,9 @@ func compareObj(obj1, obj2 object.Object, op tokens.TokenType) (bool, error) {
 	return false, fmt.Errorf("unsupported compare type:  %v, %v", obj1.Type(), obj2.Type())
 }
 
-func evalUnary(node *ast.Unary) (object.Object, error) {
+func evalUnary(node *ast.Unary, env *object.Environment) (object.Object, error) {
 	op := node.Operator
-	obj, err := Eval(node.Right)
+	obj, err := Eval(node.Right, env)
 	if err != nil {
 		return nil, err
 	}
