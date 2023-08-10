@@ -62,6 +62,52 @@ func TestEval(t *testing.T) {
 	}
 }
 
+func TestEvalLet(t *testing.T) {
+	type args struct {
+		input ast.Node
+	}
+
+	env := object.NewEnvironment()
+
+	wantEnv1 := object.NewEnvironment()
+	wantEnv1.Set("x", &object.Integer{Value: 64})
+
+	tests := []struct {
+		name    string
+		args    args
+		want    object.Object
+		wantEnv *object.Environment
+		wantErr bool
+	}{
+		{
+			name: "eval let",
+			args: args{
+				input: ast.NewLetStmt(
+					tokens.NewToken(tokens.IDENT, "x", "x"),
+					ast.NewLiteral(tokens.NewToken(tokens.INTEGER, "64", int64(64))),
+				),
+			},
+			wantEnv: wantEnv1,
+			want:    &object.Integer{Value: 64},
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			obj, err := Eval(tt.args.input, env)
+			fmt.Printf("%+v\n", obj)
+			fmt.Printf("type: %+v\n", reflect.TypeOf(obj))
+
+			envObj, ok := env.Get("x")
+			fmt.Printf("envObj: %+v, %+v\n", envObj, ok)
+
+			assert.Nil(t, err)
+			assert.Equal(t, tt.want, obj)
+			assert.Equal(t, tt.wantEnv, env)
+		})
+	}
+}
+
 func TestEval1(t *testing.T) {
 	type args struct {
 		input ast.Node

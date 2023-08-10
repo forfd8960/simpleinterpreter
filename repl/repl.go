@@ -7,6 +7,7 @@ import (
 
 	"github.com/forfd8960/simpleinterpreter/eval"
 	"github.com/forfd8960/simpleinterpreter/lexer"
+	"github.com/forfd8960/simpleinterpreter/object"
 	"github.com/forfd8960/simpleinterpreter/parser"
 )
 
@@ -15,6 +16,7 @@ const PROMT = ">>%s"
 func Start(in io.Reader, out io.Writer) {
 	scanner := bufio.NewScanner(in)
 
+	env := object.NewEnvironment()
 	for {
 		fmt.Printf(PROMT, " ")
 		scanned := scanner.Scan()
@@ -36,7 +38,7 @@ func Start(in io.Reader, out io.Writer) {
 			continue
 		}
 
-		result, err := eval.Eval(program)
+		result, err := eval.Eval(program, env)
 		if err != nil {
 			fmt.Println("lexer err: ", err)
 			continue

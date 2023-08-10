@@ -22,6 +22,8 @@ func Eval(node ast.Node, env *object.Environment) (object.Object, error) {
 		return evalStatements(v.Stmts, env)
 	case *ast.Block:
 		return evalBockStmts(v, env)
+	case *ast.LetStmt:
+		return evalLetStmt(v, env)
 	case *ast.IFStmt:
 		return evalIfStmt(v, env)
 	case *ast.ReturnStmt:
@@ -70,6 +72,16 @@ func evalBockStmts(b *ast.Block, env *object.Environment) (object.Object, error)
 		}
 	}
 
+	return obj, nil
+}
+
+func evalLetStmt(let *ast.LetStmt, env *object.Environment) (object.Object, error) {
+	obj, err := Eval(let.InitExpr, env)
+	if err != nil {
+		return nil, err
+	}
+
+	env.Set(let.Ident.Name, obj)
 	return obj, nil
 }
 
