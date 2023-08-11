@@ -8,9 +8,59 @@ import (
 	"github.com/stretchr/testify/assert"
 
 	"github.com/forfd8960/simpleinterpreter/ast"
+	"github.com/forfd8960/simpleinterpreter/lexer"
 	"github.com/forfd8960/simpleinterpreter/object"
+	"github.com/forfd8960/simpleinterpreter/parser"
 	"github.com/forfd8960/simpleinterpreter/tokens"
 )
+
+func TestIntegrateEval(t *testing.T) {
+	type args struct {
+		input string
+	}
+
+	env := object.NewEnvironment()
+	tests := []struct {
+		name    string
+		args    args
+		want    object.Object
+		wantErr bool
+	}{
+		{
+			name: "eval let",
+			args: args{
+				input: `let x = 5;`,
+			},
+			want:    &object.Integer{Value: 5},
+			wantErr: false,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			tokens, err := lexer.TokensFromInput(tt.args.input)
+			for _, tk := range tokens {
+				fmt.Printf("token: %s\n", tk)
+			}
+
+			fmt.Printf("lexer token err: %v\n", err)
+
+			if assert.Nil(t, err) {
+				parser := parser.NewParser(tokens)
+				root, err := parser.ParseProgram()
+
+				fmt.Printf("%+v\n", root)
+				fmt.Printf("parser err: %v\n", err)
+
+				if assert.Nil(t, err) {
+					obj, err := Eval(root, env)
+					assert.Nil(t, err)
+					assert.Equal(t, tt.want, obj)
+				}
+			}
+		})
+	}
+}
 
 func TestEval(t *testing.T) {
 	type args struct {

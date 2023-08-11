@@ -13,6 +13,7 @@ var (
 	ErrNotIntegerValue      = "value: %v is not integer"
 	ErrNotBoolValue         = "value: %v is not boolean"
 	ErrNotStringValue       = "value: %v is not string"
+	ErrDivideByZero         = "integer divide by zero"
 	ErrNotSupportedOperator = "operator is not supported: %v"
 )
 
@@ -30,6 +31,8 @@ func Eval(node ast.Node, env *object.Environment) (object.Object, error) {
 		return evalReturn(v, env)
 	case *ast.ExpressionStmt:
 		return Eval(v.Expr, env)
+	case *ast.Grouping:
+		return evalGroup(v, env)
 	case *ast.Literal:
 		return evalLiteral(v)
 	case *ast.Binary:
@@ -113,6 +116,10 @@ func evalReturn(v *ast.ReturnStmt, env *object.Environment) (object.Object, erro
 	return &object.Return{Value: result}, nil
 }
 
+func evalGroup(g *ast.Grouping, env *object.Environment) (object.Object, error) {
+	return Eval(g.Expr, env)
+}
+
 func evalLiteral(literal *ast.Literal) (object.Object, error) {
 	value := literal.Value
 	switch value.TkType {
@@ -156,6 +163,9 @@ func evalBinary(bin *ast.Binary, env *object.Environment) (object.Object, error)
 		case tokens.ASTERISK:
 			return &object.Integer{Value: leftValue.Value * rightValue.Value}, nil
 		case tokens.SLASH:
+			if rightValue.Value == 0 {
+				return nil, fmt.Errorf(ErrDivideByZero)
+			}
 			return &object.Integer{Value: leftValue.Value / rightValue.Value}, nil
 		}
 

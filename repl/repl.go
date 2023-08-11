@@ -34,13 +34,13 @@ func Start(in io.Reader, out io.Writer) {
 		p := parser.NewParser(tokens)
 		program, err := p.ParseProgram()
 		if err != nil {
-			fmt.Println("lexer err: ", err)
+			fmt.Println("parser err: ", err)
 			continue
 		}
 
 		result, err := eval.Eval(program, env)
 		if err != nil {
-			fmt.Println("lexer err: ", err)
+			fmt.Println("eval err: ", err)
 			continue
 		}
 

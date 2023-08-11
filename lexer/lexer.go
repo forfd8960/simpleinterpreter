@@ -66,7 +66,8 @@ func (l *Lexer) scanToken() (*tokens.Token, error) {
 	)
 
 	r := l.consumeWhiteSpace()
-	if l.isAtEnd() {
+	_, ok := whiteSpace[r]
+	if ok && l.isAtEnd() {
 		return newEOFToken(), nil
 	}
 
@@ -99,6 +100,7 @@ func (l *Lexer) scanToken() (*tokens.Token, error) {
 		tok = l.buildToken(tokens.LBRACE, "{")
 	case '}':
 		tok = l.buildToken(tokens.RBRACE, "}")
+
 	default:
 		if isDigit(r) {
 			tok, err = l.parseInteger()
