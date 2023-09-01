@@ -55,10 +55,16 @@ func evalStatements(nodes []ast.Stmt, env *object.Environment) (object.Object, e
 		}
 
 		if err != nil {
-			return nil, err
+			return newError(err.Error()), nil
 		}
 	}
 	return result, nil
+}
+
+func newError(format string, args ...interface{}) *object.Error {
+	return &object.Error{
+		Message: fmt.Sprintf(format, args...),
+	}
 }
 
 func evalBockStmts(b *ast.Block, env *object.Environment) (object.Object, error) {

@@ -6,4 +6,5 @@ const (
 	OBJ_STRING  ObjectType = "STRING"
 	OBJ_NULL    ObjectType = "NULL"
 	OBJ_RETURN  ObjectType = "RETURN"
+	OBJ_ERROR   ObjectType = "ERROR"
 )

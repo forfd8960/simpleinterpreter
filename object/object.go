@@ -70,3 +70,14 @@ func (ret *Return) Inspect() string {
 func (ret *Return) Type() ObjectType {
 	return OBJ_RETURN
 }
+
+type Error struct {
+	Message string
+}
+
+func (err *Error) Inspect() string {
+	return "Error: " + err.Message
+}
+func (err *Error) Type() ObjectType {
+	return OBJ_ERROR
+}
