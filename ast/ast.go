@@ -43,6 +43,7 @@ func NewIdentifier(name *tokens.Token) *Identifier {
 	return &Identifier{Token: name, Name: name.Literal}
 }
 
+func (ident *Identifier) StmtNode() {}
 func (ident *Identifier) ExprNode() {}
 func (ident *Identifier) TokenLiteral() string {
 	return ident.Token.Literal

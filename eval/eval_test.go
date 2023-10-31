@@ -196,6 +196,42 @@ func TestEval1(t *testing.T) {
 	}
 }
 
+func TestEvalIdentifier(t *testing.T) {
+	type args struct {
+		input ast.Node
+	}
+
+	env := object.NewEnvironment()
+	env.Set("x", &object.Integer{Value: 100})
+
+	tests := []struct {
+		name    string
+		args    args
+		want    object.Object
+		wantErr bool
+	}{
+		{
+			name: "eval identifier",
+			args: args{
+				input: &ast.Program{
+					Stmts: []ast.Stmt{
+						ast.NewIdentifier(tokens.NewToken(tokens.IDENT, "x", "x")),
+					},
+				},
+			},
+			want:    &object.Integer{Value: 100},
+			wantErr: false,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			obj, err := Eval(tt.args.input, env)
+			assert.Nil(t, err)
+			assert.Equal(t, tt.want, obj)
+		})
+	}
+}
+
 func TestEvalBinary(t *testing.T) {
 	type args struct {
 		input ast.Node
