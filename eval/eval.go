@@ -15,6 +15,7 @@ var (
 	ErrNotStringValue       = "value: %v is not string"
 	ErrDivideByZero         = "integer divide by zero"
 	ErrNotSupportedOperator = "operator is not supported: %v"
+	ErrIdentifierNotFound   = "identifier: %s is not found"
 )
 
 func Eval(node ast.Node, env *object.Environment) (object.Object, error) {
@@ -25,6 +26,8 @@ func Eval(node ast.Node, env *object.Environment) (object.Object, error) {
 		return evalBockStmts(v, env)
 	case *ast.LetStmt:
 		return evalLetStmt(v, env)
+	case *ast.Identifier:
+		return evalIdent(v, env)
 	case *ast.IFStmt:
 		return evalIfStmt(v, env)
 	case *ast.ReturnStmt:
@@ -91,6 +94,15 @@ func evalLetStmt(let *ast.LetStmt, env *object.Environment) (object.Object, erro
 	}
 
 	env.Set(let.Ident.Name, obj)
+	return obj, nil
+}
+
+func evalIdent(ident *ast.Identifier, env *object.Environment) (object.Object, error) {
+	obj, ok := env.Get(ident.Name)
+	if !ok {
+		return nil, fmt.Errorf(ErrIdentifierNotFound, ident.Name)
+	}
+
 	return obj, nil
 }
 
@@ -174,7 +186,6 @@ func evalBinary(bin *ast.Binary, env *object.Environment) (object.Object, error)
 			}
 			return &object.Integer{Value: leftValue.Value / rightValue.Value}, nil
 		}
-
 	}
 
 	return nil, fmt.Errorf(ErrNotSupportedOperator, bin.Operator.Literal)
