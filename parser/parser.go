@@ -470,8 +470,26 @@ func (p *Parser) unary() (ast.Expression, error) {
 		return ast.NewUnary(op, right), nil
 	}
 
-	// return p.call()
-	return p.primary()
+	return p.call()
+}
+
+func (p *Parser) call() (ast.Expression, error) {
+	expr, err := p.primary()
+	if err != nil {
+		return nil, err
+	}
+
+	for {
+		if p.match(tokens.LPRARENT) {
+			expr, err = p.finishCall(expr)
+			if err != nil {
+				return nil, err
+			}
+		} else {
+			break
+		}
+	}
+	return expr, nil
 }
 
 func (p *Parser) primary() (ast.Expression, error) {
@@ -499,6 +517,26 @@ func (p *Parser) primary() (ast.Expression, error) {
 	}
 
 	return nil, fmt.Errorf("unknow expr")
+}
+
+func (p *Parser) finishCall(callee ast.Expression) (ast.Expression, error) {
+	arguments := make([]ast.Expression, 0, 10)
+	if !p.check(tokens.RPARENT) {
+		expr, err := p.parseExpr()
+		if err != nil {
+			return nil, err
+		}
+		arguments = append(arguments, expr)
+
+		for p.check(tokens.COMMA) {
+			expr, err := p.parseExpr()
+			if err != nil {
+				return nil, err
+			}
+			arguments = append(arguments, expr)
+		}
+	}
+	return ast.NewCall(callee, arguments), nil
 }
 
 func (p *Parser) consume(tkType tokens.TokenType, msg string) (*tokens.Token, error) {

@@ -128,6 +128,23 @@ func (un *Unary) TokenLiteral() string {
 	return un.Operator.Literal
 }
 
+type Call struct {
+	Callee    Expression
+	Arguments []Expression
+}
+
+func NewCall(callee Expression, arguments []Expression) *Call {
+	return &Call{
+		Callee:    callee,
+		Arguments: arguments,
+	}
+}
+
+func (call *Call) ExprNode() {}
+func (call *Call) TokenLiteral() string {
+	return call.Callee.TokenLiteral()
+}
+
 type Literal struct {
 	Value *tokens.Token
 }
