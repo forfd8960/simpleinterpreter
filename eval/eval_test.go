@@ -14,6 +14,26 @@ import (
 	"github.com/forfd8960/simpleinterpreter/tokens"
 )
 
+func testEvalInput(input string) (object.Object, error) {
+	env := object.NewEnvironment()
+	tokens, err := lexer.TokensFromInput(input)
+	if err != nil {
+		return nil, err
+	}
+
+	for _, tk := range tokens {
+		fmt.Printf("token: %s\n", tk)
+	}
+
+	parser := parser.NewParser(tokens)
+	root, err := parser.ParseProgram()
+	if err != nil {
+		return nil, err
+	}
+
+	return Eval(root, env)
+}
+
 func TestIntegrateEval(t *testing.T) {
 	type args struct {
 		input string
@@ -106,6 +126,51 @@ func TestEval(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			obj, err := Eval(tt.args.input, env)
+			assert.Nil(t, err)
+			assert.Equal(t, tt.want, obj)
+		})
+	}
+}
+
+func TestEvalFunction(t *testing.T) {
+	type args struct {
+		input string
+	}
+
+	tests := []struct {
+		name    string
+		args    args
+		want    object.Object
+		wantErr bool
+	}{
+		{
+			name: "eval function",
+			args: args{
+				input: `fn add(x) { return x + 10; }`,
+			},
+			want: &object.Function{
+				Parameters: []*ast.Identifier{
+					ast.NewIdentifier(tokens.NewToken(tokens.IDENT, "x", "x")),
+				},
+				Body: ast.NewBlockStmt([]ast.Stmt{
+					ast.NewReturnStmt(
+						tokens.LookupTokenByIdent(tokens.KWReturn),
+						ast.NewBinary(
+							ast.NewIdentifier(tokens.NewToken(tokens.IDENT, "x", "x")),
+							ast.NewLiteral(tokens.NewToken(tokens.INTEGER, "10", int64(10))),
+							tokens.NewToken(tokens.PLUS, "+", "+"),
+						),
+					),
+				}),
+				Env: object.NewEnvironment(),
+			},
+			wantErr: false,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			obj, err := testEvalInput(tt.args.input)
 			assert.Nil(t, err)
 			assert.Equal(t, tt.want, obj)
 		})
