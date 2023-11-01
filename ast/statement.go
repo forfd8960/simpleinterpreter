@@ -1,6 +1,8 @@
 package ast
 
-import "github.com/forfd8960/simpleinterpreter/tokens"
+import (
+	"github.com/forfd8960/simpleinterpreter/tokens"
+)
 
 type ReturnStmt struct {
 	Keyword *tokens.Token
@@ -48,7 +50,7 @@ func (espst *ExpressionStmt) TokenLiteral() string {
 type Function struct {
 	Name       *tokens.Token
 	Parameters []*tokens.Token
-	Body       []Stmt
+	Body       *Block
 }
 
 func (fn *Function) StmtNode() {}
@@ -56,8 +58,8 @@ func (fn *Function) TokenLiteral() string {
 	return "function"
 }
 
-func NewFunctionStmt(name *tokens.Token, params []*tokens.Token, body []Stmt) *Function {
-	return &Function{Name: name, Parameters: params, Body: body}
+func NewFunctionStmt(name *tokens.Token, params []*tokens.Token, blockStmt *Block) *Function {
+	return &Function{Name: name, Parameters: params, Body: blockStmt}
 }
 
 type IFStmt struct {

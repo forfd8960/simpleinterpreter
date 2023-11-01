@@ -5,12 +5,16 @@ import (
 	"strings"
 )
 
+const (
+	KWReturn = "return"
+)
+
 var keywords = map[string]TokenType{
 	"let":    LET,
 	"fn":     FUNCTION,
 	"if":     IF,
 	"else":   ELSE,
-	"return": RETURN,
+	KWReturn: RETURN,
 	"true":   TRUE,
 	"false":  FALSE,
 	"null":   NIL,
@@ -47,7 +51,7 @@ var keyword2Token = map[string]*Token{
 		Literal: "else",
 		Value:   "else",
 	},
-	"return": {
+	KWReturn: {
 		TkType:  RETURN,
 		Literal: "return",
 		Value:   "return",

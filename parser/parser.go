@@ -168,7 +168,7 @@ func (p *Parser) statement() (ast.Stmt, error) {
 		if err != nil {
 			return nil, err
 		}
-		return ast.NewBlockStmt(block), nil
+		return block, nil
 	}
 
 	return p.expressionStatement()
@@ -286,7 +286,7 @@ func (p *Parser) whileStatement() (ast.Stmt, error) {
 	return ast.NewWhileStmt(cond, body), nil
 }
 
-func (p *Parser) block() ([]ast.Stmt, error) {
+func (p *Parser) block() (*ast.Block, error) {
 	statements := make([]ast.Stmt, 0, 1)
 
 	for !p.check(tokens.RBRACE) && !p.isAtEnd() {
@@ -298,8 +298,10 @@ func (p *Parser) block() ([]ast.Stmt, error) {
 		statements = append(statements, d)
 	}
 
-	p.consume(tokens.RBRACE, `Expect "}" after block!`)
-	return statements, nil
+	if _, err := p.consume(tokens.RBRACE, `Expect "}" after block!`); err != nil {
+		return nil, err
+	}
+	return ast.NewBlockStmt(statements), nil
 }
 
 func (p *Parser) expressionStatement() (*ast.ExpressionStmt, error) {

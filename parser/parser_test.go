@@ -197,3 +197,47 @@ func TestParseLiteral(t *testing.T) {
 		}
 	}
 }
+
+func TestParseFunction(t *testing.T) {
+	input := `
+	fn add(x) {
+		return x + 1;
+	}
+	`
+
+	tokenList, err := lexer.TokensFromInput(input)
+	assert.Nil(t, err)
+
+	for _, tk := range tokenList {
+		fmt.Println(tk.String())
+	}
+
+	p := NewParser(tokenList)
+	if assert.NotNil(t, p) {
+		program, err := p.ParseProgram()
+		if assert.Nil(t, err) {
+			if assert.NotNil(t, program) {
+				if assert.Equal(t, 1, len(program.Stmts)) {
+					assert.Equal(t, ast.NewFunctionStmt(
+						tokens.NewToken(tokens.IDENT, "add", "add"),
+						[]*tokens.Token{
+							tokens.NewToken(tokens.IDENT, "x", "x"),
+						},
+						ast.NewBlockStmt([]ast.Stmt{
+							ast.NewReturnStmt(
+								tokens.LookupTokenByIdent(tokens.KWReturn),
+								ast.NewBinary(
+									ast.NewIdentifier(tokens.NewToken(tokens.IDENT, "x", "x")),
+									ast.NewLiteral(tokens.NewToken(tokens.INTEGER, "1", int64(1))),
+									tokens.NewToken(tokens.PLUS, "+", "+"),
+								),
+							),
+						}),
+					),
+						program.Stmts[0],
+					)
+				}
+			}
+		}
+	}
+}

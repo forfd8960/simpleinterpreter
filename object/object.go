@@ -2,6 +2,9 @@ package object
 
 import (
 	"strconv"
+	"strings"
+
+	"github.com/forfd8960/simpleinterpreter/ast"
 )
 
 type ObjectType string
@@ -9,6 +12,30 @@ type ObjectType string
 type Object interface {
 	Type() ObjectType
 	Inspect() string
+}
+
+type Function struct {
+	Parameters []*ast.Identifier
+	Body       *ast.Block
+	Env        *Environment
+}
+
+func (fn *Function) Inspect() string {
+	sb := &strings.Builder{}
+
+	sb.WriteString("fn(")
+
+	var ps []string
+	for _, p := range fn.Parameters {
+		ps = append(ps, p.Token.String())
+	}
+	sb.WriteString(strings.Join(ps, ","))
+	sb.WriteString(")\n")
+	return sb.String()
+}
+
+func (fn *Function) Type() ObjectType {
+	return OBJ_FUNCTION
 }
 
 type Integer struct {
