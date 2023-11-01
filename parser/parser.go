@@ -301,6 +301,11 @@ func (p *Parser) block() (*ast.Block, error) {
 	if _, err := p.consume(tokens.RBRACE, `Expect "}" after block!`); err != nil {
 		return nil, err
 	}
+
+	if p.check(tokens.SEMICOLON) {
+		p.consume(tokens.SEMICOLON, `Expect ; after block!`)
+	}
+
 	return ast.NewBlockStmt(statements), nil
 }
 

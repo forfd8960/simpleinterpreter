@@ -22,6 +22,8 @@ func Eval(node ast.Node, env *object.Environment) (object.Object, error) {
 	switch v := node.(type) {
 	case *ast.Program:
 		return evalStatements(v.Stmts, env)
+	case *ast.Function:
+		return evalFunctionStmt(v, env)
 	case *ast.Block:
 		return evalBockStmts(v, env)
 	case *ast.LetStmt:
@@ -62,6 +64,19 @@ func evalStatements(nodes []ast.Stmt, env *object.Environment) (object.Object, e
 		}
 	}
 	return result, nil
+}
+
+func evalFunctionStmt(v *ast.Function, env *object.Environment) (object.Object, error) {
+	params := make([]*ast.Identifier, 0, len(v.Parameters))
+	for _, token := range v.Parameters {
+		params = append(params, ast.NewIdentifier(token))
+	}
+
+	return &object.Function{
+		Parameters: params,
+		Body:       v.Body,
+		Env:        env,
+	}, nil
 }
 
 func newError(format string, args ...interface{}) *object.Error {

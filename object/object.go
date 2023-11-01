@@ -22,7 +22,6 @@ type Function struct {
 
 func (fn *Function) Inspect() string {
 	sb := &strings.Builder{}
-
 	sb.WriteString("fn(")
 
 	var ps []string
@@ -30,7 +29,7 @@ func (fn *Function) Inspect() string {
 		ps = append(ps, p.Token.String())
 	}
 	sb.WriteString(strings.Join(ps, ","))
-	sb.WriteString(")\n")
+	sb.WriteString(")")
 	return sb.String()
 }
 
