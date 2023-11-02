@@ -208,10 +208,6 @@ func TestParseFunction(t *testing.T) {
 	tokenList, err := lexer.TokensFromInput(input)
 	assert.Nil(t, err)
 
-	for _, tk := range tokenList {
-		fmt.Println(tk.String())
-	}
-
 	p := NewParser(tokenList)
 	if assert.NotNil(t, p) {
 		program, err := p.ParseProgram()
@@ -239,5 +235,73 @@ func TestParseFunction(t *testing.T) {
 				}
 			}
 		}
+	}
+}
+
+func TestParseCallExpression(t *testing.T) {
+	tests := []struct {
+		name    string
+		input   string
+		program *ast.Program
+		err     error
+	}{
+		{
+			name:  "parse one function call",
+			input: "add(1, 2);",
+			program: &ast.Program{
+				Stmts: []ast.Stmt{
+					ast.NewExpressionStmt(ast.NewCall(
+						ast.NewIdentifier(tokens.NewToken(tokens.IDENT, "add", "add")),
+						[]ast.Expression{
+							ast.NewLiteral(tokens.NewToken(tokens.INTEGER, "1", int64(1))),
+							ast.NewLiteral(tokens.NewToken(tokens.INTEGER, "2", int64(2))),
+						},
+					)),
+				},
+			},
+			err: nil,
+		},
+		{
+			name:  "parse stacked function call",
+			input: "add(minus(1), div(2));",
+			program: &ast.Program{
+				Stmts: []ast.Stmt{
+					ast.NewExpressionStmt(ast.NewCall(
+						ast.NewIdentifier(tokens.NewToken(tokens.IDENT, "add", "add")),
+						[]ast.Expression{
+							ast.NewCall(
+								ast.NewIdentifier(tokens.NewToken(tokens.IDENT, "minus", "minus")),
+								[]ast.Expression{ast.NewLiteral(tokens.NewToken(tokens.INTEGER, "1", int64(1)))},
+							),
+							ast.NewCall(
+								ast.NewIdentifier(tokens.NewToken(tokens.IDENT, "div", "div")),
+								[]ast.Expression{ast.NewLiteral(tokens.NewToken(tokens.INTEGER, "2", int64(2)))},
+							),
+						},
+					)),
+				},
+			},
+			err: nil,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			tokenList, err := lexer.TokensFromInput(tt.input)
+			assert.Nil(t, err)
+
+			p := NewParser(tokenList)
+			if assert.NotNil(t, p) {
+				program, err := p.ParseProgram()
+				if assert.Equal(t, tt.err, err) {
+					if assert.NotNil(t, program) {
+						if assert.Equal(t, 1, len(program.Stmts)) {
+							fmt.Printf("%+v\n", program.Stmts[0])
+							assert.Equal(t, tt.program, program)
+						}
+					}
+				}
+			}
+		})
 	}
 }

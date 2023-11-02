@@ -479,16 +479,13 @@ func (p *Parser) call() (ast.Expression, error) {
 		return nil, err
 	}
 
-	for {
-		if p.match(tokens.LPRARENT) {
-			expr, err = p.finishCall(expr)
-			if err != nil {
-				return nil, err
-			}
-		} else {
-			break
+	for p.match(tokens.LPRARENT) {
+		expr, err = p.finishCall(expr)
+		if err != nil {
+			return nil, err
 		}
 	}
+
 	return expr, nil
 }
 
@@ -529,6 +526,8 @@ func (p *Parser) finishCall(callee ast.Expression) (ast.Expression, error) {
 		arguments = append(arguments, expr)
 
 		for p.check(tokens.COMMA) {
+			p.consume(tokens.COMMA, "expect comma after (")
+
 			expr, err := p.parseExpr()
 			if err != nil {
 				return nil, err
@@ -540,8 +539,9 @@ func (p *Parser) finishCall(callee ast.Expression) (ast.Expression, error) {
 	if _, err := p.consume(tokens.RPARENT, "Expect ) after call"); err != nil {
 		return nil, err
 	}
-	if _, err := p.consume(tokens.SEMICOLON, "Expect ; after )"); err != nil {
-		return nil, err
+
+	if p.check(tokens.SEMICOLON) {
+		p.consume(tokens.SEMICOLON, "Expect ; after )")
 	}
 
 	return ast.NewCall(callee, arguments), nil
