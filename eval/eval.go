@@ -9,13 +9,14 @@ import (
 )
 
 var (
-	ErrNodeNotLiteral       = "node: %v is not literal"
-	ErrNotIntegerValue      = "value: %v is not integer"
-	ErrNotBoolValue         = "value: %v is not boolean"
-	ErrNotStringValue       = "value: %v is not string"
-	ErrDivideByZero         = "integer divide by zero"
-	ErrNotSupportedOperator = "operator is not supported: %v"
-	ErrIdentifierNotFound   = "identifier: %s is not found"
+	ErrNodeNotLiteral          = "node: %v is not literal"
+	ErrNotIntegerValue         = "value: %v is not integer"
+	ErrNotBoolValue            = "value: %v is not boolean"
+	ErrNotStringValue          = "value: %v is not string"
+	ErrDivideByZero            = "integer divide by zero"
+	ErrNotSupportedOperator    = "operator is not supported: %v"
+	ErrIdentifierNotFound      = "identifier: %s is not found"
+	ErrIdentifierIsNotCallable = "%s is not callable(it shoud be function or xxx)"
 )
 
 func Eval(node ast.Node, env *object.Environment) (object.Object, error) {
@@ -44,6 +45,8 @@ func Eval(node ast.Node, env *object.Environment) (object.Object, error) {
 		return evalBinary(v, env)
 	case *ast.Unary:
 		return evalUnary(v, env)
+	case *ast.Call:
+		return evalCall(v, env)
 	}
 
 	return nil, nil
@@ -66,17 +69,21 @@ func evalStatements(nodes []ast.Stmt, env *object.Environment) (object.Object, e
 	return result, nil
 }
 
-func evalFunctionStmt(v *ast.Function, env *object.Environment) (object.Object, error) {
-	params := make([]*ast.Identifier, 0, len(v.Parameters))
-	for _, token := range v.Parameters {
+func evalFunctionStmt(astFn *ast.Function, env *object.Environment) (object.Object, error) {
+	params := make([]*ast.Identifier, 0, len(astFn.Parameters))
+	for _, token := range astFn.Parameters {
 		params = append(params, ast.NewIdentifier(token))
 	}
 
-	return &object.Function{
+	fn := &object.Function{
 		Parameters: params,
-		Body:       v.Body,
+		Body:       astFn.Body,
 		Env:        env,
-	}, nil
+	}
+
+	// register to env, and call expression can find the function object later
+	env.Set(astFn.Name.String(), fn)
+	return fn, nil
 }
 
 func newError(format string, args ...interface{}) *object.Error {
@@ -248,6 +255,38 @@ func evalUnary(node *ast.Unary, env *object.Environment) (object.Object, error) 
 	}
 
 	return nil, fmt.Errorf("unsupported unary Operator: %v", op)
+}
+
+func evalCall(callExpr *ast.Call, globalEnv *object.Environment) (object.Object, error) {
+	// callExpr.Callee is a identifier, and after Eval, it should return a function object
+	callee, err := Eval(callExpr.Callee, globalEnv)
+	if err != nil {
+		return nil, err
+	}
+
+	fn, ok := callee.(*object.Function)
+	if !ok {
+		return nil, fmt.Errorf(ErrIdentifierIsNotCallable, callee.Inspect())
+	}
+
+	arguments := make([]object.Object, 0, len(fn.Parameters))
+	for _, param := range fn.Parameters {
+		v, err := Eval(param, globalEnv)
+		if err != nil {
+			return nil, err
+		}
+
+		arguments = append(arguments, v)
+	}
+
+	var env = object.NewEnvWithOutter(fn.Env)
+	if len(arguments) > 0 {
+		for idx, arg := range arguments {
+			env.Set(fn.Parameters[idx].Name, arg)
+		}
+	}
+
+	return Eval(fn.Body, env)
 }
 
 func evalLiteralInteger(value interface{}) (*object.Integer, error) {

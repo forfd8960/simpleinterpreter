@@ -536,6 +536,14 @@ func (p *Parser) finishCall(callee ast.Expression) (ast.Expression, error) {
 			arguments = append(arguments, expr)
 		}
 	}
+
+	if _, err := p.consume(tokens.RPARENT, "Expect ) after call"); err != nil {
+		return nil, err
+	}
+	if _, err := p.consume(tokens.SEMICOLON, "Expect ; after )"); err != nil {
+		return nil, err
+	}
+
 	return ast.NewCall(callee, arguments), nil
 }
 

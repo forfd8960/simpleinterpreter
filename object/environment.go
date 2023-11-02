@@ -1,19 +1,30 @@
 package object
 
 type Environment struct {
-	env map[string]Object
+	kv     map[string]Object
+	outter *Environment // the outter env for a function
+}
+
+func NewEnvWithOutter(outter *Environment) *Environment {
+	return &Environment{
+		kv:     map[string]Object{},
+		outter: outter,
+	}
 }
 
 func NewEnvironment() *Environment {
-	return &Environment{env: make(map[string]Object, 10)}
+	return &Environment{kv: make(map[string]Object, 10)}
 }
 
 func (env *Environment) Get(identifier string) (Object, bool) {
-	obj, ok := env.env[identifier]
+	obj, ok := env.kv[identifier]
+	if !ok && env.outter != nil {
+		return env.outter.Get(identifier)
+	}
 	return obj, ok
 }
 
 func (env *Environment) Set(identifier string, value Object) Object {
-	env.env[identifier] = value
+	env.kv[identifier] = value
 	return value
 }
