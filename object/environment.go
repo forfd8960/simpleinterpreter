@@ -13,7 +13,10 @@ func NewEnvWithOutter(outter *Environment) *Environment {
 }
 
 func NewEnvironment() *Environment {
-	return &Environment{kv: make(map[string]Object, 10)}
+	return &Environment{
+		kv:     make(map[string]Object, 10),
+		outter: &Environment{},
+	}
 }
 
 func (env *Environment) Get(identifier string) (Object, bool) {

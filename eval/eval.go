@@ -82,7 +82,7 @@ func evalFunctionStmt(astFn *ast.Function, env *object.Environment) (object.Obje
 	}
 
 	// register to env, and call expression can find the function object later
-	env.Set(astFn.Name.String(), fn)
+	env.Set(astFn.Name.Literal, fn)
 	return fn, nil
 }
 
@@ -269,24 +269,34 @@ func evalCall(callExpr *ast.Call, globalEnv *object.Environment) (object.Object,
 		return nil, fmt.Errorf(ErrIdentifierIsNotCallable, callee.Inspect())
 	}
 
-	arguments := make([]object.Object, 0, len(fn.Parameters))
-	for _, param := range fn.Parameters {
-		v, err := Eval(param, globalEnv)
-		if err != nil {
-			return nil, err
-		}
-
-		arguments = append(arguments, v)
+	if len(fn.Parameters) != len(callExpr.Arguments) {
+		return nil, fmt.Errorf("not engough params to function: %s, need %d arguments", fn.Inspect(), len(fn.Parameters))
 	}
 
 	var env = object.NewEnvWithOutter(fn.Env)
-	if len(arguments) > 0 {
-		for idx, arg := range arguments {
-			env.Set(fn.Parameters[idx].Name, arg)
+	if len(fn.Parameters) > 0 {
+		for idx, param := range fn.Parameters {
+			v, err := Eval(callExpr.Arguments[idx], globalEnv)
+			if err != nil {
+				return nil, err
+			}
+
+			fmt.Printf("setting %s with value: %+v\n", param.Name, v)
+			env.Set(param.Name, v)
 		}
 	}
 
-	return Eval(fn.Body, env)
+	obj, err := Eval(fn.Body, env)
+	if err != nil {
+		return nil, err
+	}
+
+	result := obj
+	for result.Type() == object.OBJ_RETURN {
+		v := result.(*object.Return)
+		result = v.Value
+	}
+	return result, nil
 }
 
 func evalLiteralInteger(value interface{}) (*object.Integer, error) {

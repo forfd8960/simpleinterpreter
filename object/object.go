@@ -26,7 +26,7 @@ func (fn *Function) Inspect() string {
 
 	var ps []string
 	for _, p := range fn.Parameters {
-		ps = append(ps, p.Token.String())
+		ps = append(ps, p.Name)
 	}
 	sb.WriteString(strings.Join(ps, ","))
 	sb.WriteString(")")

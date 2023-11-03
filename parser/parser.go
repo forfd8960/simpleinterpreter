@@ -540,10 +540,6 @@ func (p *Parser) finishCall(callee ast.Expression) (ast.Expression, error) {
 		return nil, err
 	}
 
-	if p.check(tokens.SEMICOLON) {
-		p.consume(tokens.SEMICOLON, "Expect ; after )")
-	}
-
 	return ast.NewCall(callee, arguments), nil
 }
 

@@ -137,6 +137,24 @@ func TestEvalFunction(t *testing.T) {
 		input string
 	}
 
+	fnEnv := object.NewEnvironment()
+	fnEnv.Set("add", &object.Function{
+		Parameters: []*ast.Identifier{
+			ast.NewIdentifier(tokens.NewToken(tokens.IDENT, "x", "x")),
+		},
+		Body: ast.NewBlockStmt([]ast.Stmt{
+			ast.NewReturnStmt(
+				tokens.LookupTokenByIdent(tokens.KWReturn),
+				ast.NewBinary(
+					ast.NewIdentifier(tokens.NewToken(tokens.IDENT, "x", "x")),
+					ast.NewLiteral(tokens.NewToken(tokens.INTEGER, "10", int64(10))),
+					tokens.NewToken(tokens.PLUS, "+", "+"),
+				),
+			),
+		}),
+		Env: object.NewEnvironment(),
+	})
+
 	tests := []struct {
 		name    string
 		args    args
@@ -146,7 +164,9 @@ func TestEvalFunction(t *testing.T) {
 		{
 			name: "eval function",
 			args: args{
-				input: `fn add(x) { return x + 10; }`,
+				input: `
+				fn add(x) { return x + 10; }
+				`,
 			},
 			want: &object.Function{
 				Parameters: []*ast.Identifier{
@@ -162,8 +182,19 @@ func TestEvalFunction(t *testing.T) {
 						),
 					),
 				}),
-				Env: object.NewEnvironment(),
+				Env: fnEnv,
 			},
+			wantErr: false,
+		},
+		{
+			name: "eval return call function",
+			args: args{
+				input: `
+				fn add(x) { return x + 10; }
+				return add(10);
+				`,
+			},
+			want:    &object.Integer{Value: int64(20)},
 			wantErr: false,
 		},
 	}
@@ -172,7 +203,20 @@ func TestEvalFunction(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			obj, err := testEvalInput(tt.args.input)
 			assert.Nil(t, err)
-			assert.Equal(t, tt.want, obj)
+
+			if assert.NotNil(t, obj) {
+				objFn, ok := obj.(*object.Function)
+				wantFn, ok1 := tt.want.(*object.Function)
+				if ok && ok1 {
+					assert.Equal(t, wantFn.Parameters, objFn.Parameters)
+					assert.Equal(t, wantFn.Body, objFn.Body)
+					fn1, _ := wantFn.Env.Get("add")
+					fn2, _ := objFn.Env.Get("add")
+					assert.Equal(t, fn1.Inspect(), fn2.Inspect())
+				} else {
+					assert.Equal(t, tt.want, obj)
+				}
+			}
 		})
 	}
 }
