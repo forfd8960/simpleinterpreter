@@ -21,17 +21,18 @@ func testEvalInput(input string) (object.Object, error) {
 		return nil, err
 	}
 
-	for _, tk := range tokens {
-		fmt.Printf("token: %s\n", tk)
-	}
-
 	parser := parser.NewParser(tokens)
 	root, err := parser.ParseProgram()
 	if err != nil {
 		return nil, err
 	}
 
-	return Eval(root, env)
+	obj, err1 := Eval(root, env)
+	if err1 != nil {
+		return nil, err1
+	}
+
+	return obj, nil
 }
 
 func TestIntegrateEval(t *testing.T) {
@@ -197,12 +198,41 @@ func TestEvalFunction(t *testing.T) {
 			want:    &object.Integer{Value: int64(20)},
 			wantErr: false,
 		},
+		{
+			name: "eval stack call function",
+			args: args{
+				input: `
+				fn add(x) { return x + 10; }
+				fn minus(x) { return x - 1; }
+				fn divTwo(x) { return x / 2; }
+				let x = 20;
+				return add(minus(divTwo(x)));
+				`,
+			},
+			want:    &object.Integer{Value: int64(19)},
+			wantErr: false,
+		},
+		{
+			name: "unhappy - eval function not enough arguments",
+			args: args{
+				input: `
+				fn add(x, y) { return x + y; }
+				return add(10);
+				`,
+			},
+			want:    &object.Error{Message: "not engough params to function: fn(x,y), need 2 arguments"},
+			wantErr: true,
+		},
 	}
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			obj, err := testEvalInput(tt.args.input)
-			assert.Nil(t, err)
+			if tt.wantErr {
+				assert.Nil(t, err)
+				assert.Equal(t, tt.want, obj)
+				return
+			}
 
 			if assert.NotNil(t, obj) {
 				objFn, ok := obj.(*object.Function)

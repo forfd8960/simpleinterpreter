@@ -69,6 +69,7 @@ func evalStatements(nodes []ast.Stmt, env *object.Environment) (object.Object, e
 	return result, nil
 }
 
+// Todo: anonymous functions
 func evalFunctionStmt(astFn *ast.Function, env *object.Environment) (object.Object, error) {
 	params := make([]*ast.Identifier, 0, len(astFn.Parameters))
 	for _, token := range astFn.Parameters {

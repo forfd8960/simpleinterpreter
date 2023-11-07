@@ -86,6 +86,7 @@ func (p *Parser) parseLetStmt() (ast.Stmt, error) {
 	return ast.NewLetStmt(identToken, initExpr), nil
 }
 
+// Todo: anonymous functions
 func (p *Parser) function() (*ast.Function, error) {
 	name, err := p.consume(tokens.IDENT, "expect function name.")
 	if err != nil {
