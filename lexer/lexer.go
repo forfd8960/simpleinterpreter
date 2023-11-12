@@ -10,6 +10,7 @@ import (
 
 var (
 	ErrUnSupportedToken = "unsupported token: %v"
+	ErrInvalidString    = "invalid string: %s"
 	whiteSpace          = map[rune]struct{}{
 		' ':  {},
 		'\n': {},
@@ -100,14 +101,15 @@ func (l *Lexer) scanToken() (*tokens.Token, error) {
 		tok = l.buildToken(tokens.LBRACE, "{")
 	case '}':
 		tok = l.buildToken(tokens.RBRACE, "}")
-
+	case '"':
+		tok, err = l.parseString()
 	default:
 		if isDigit(r) {
 			tok, err = l.parseInteger()
 		} else if isAlpha(r) {
 			tok = l.parseIdent()
 		} else {
-			err = fmt.Errorf(ErrUnSupportedToken, r)
+			err = fmt.Errorf(ErrUnSupportedToken, string(r))
 		}
 	}
 	if err != nil {
@@ -178,6 +180,33 @@ func (l *Lexer) parseInteger() (*tokens.Token, error) {
 	}
 
 	return tokens.NewToken(tokens.INTEGER, text, num), nil
+}
+
+func (l *Lexer) parseString() (*tokens.Token, error) {
+	l.advance() // skip "
+
+	var isEnd bool
+	for l.peek() != '"' {
+		l.advance()
+		if l.isAtEnd() {
+			isEnd = true
+			break
+		}
+	}
+
+	var val string
+	if isEnd {
+		if l.peek() != '"' {
+			return nil, fmt.Errorf(ErrInvalidString, string(l.runes[l.start:]))
+		}
+
+		val = string(l.runes[l.start+1 : l.current-1])
+	} else {
+		val = string(l.runes[l.start+1 : l.current])
+		l.advance()
+	}
+
+	return tokens.NewToken(tokens.STRING, val, val), nil
 }
 
 func (l *Lexer) parseIdent() *tokens.Token {

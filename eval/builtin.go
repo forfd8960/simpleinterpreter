@@ -9,6 +9,7 @@ import (
 
 const (
 	builtInPrint = "print"
+	argFormat    = "format"
 )
 
 var (
@@ -27,7 +28,7 @@ func IsBuiltInFunction(fnName string) bool {
 
 func buildPrint(callExpr *ast.Call, env *object.Environment) *object.Function {
 	identifiers := make([]*ast.Identifier, 0, len(callExpr.Arguments))
-	identifiers = append(identifiers, ast.NewIdentifier1("format"))
+	identifiers = append(identifiers, ast.NewIdentifier1(argFormat))
 
 	for i := 1; i < len(callExpr.Arguments); i++ {
 		identifiers = append(identifiers, ast.NewIdentifier1(fmt.Sprintf("val%d", i)))
@@ -48,18 +49,27 @@ func evalBuildInFunctions(callExpr *ast.Call, globalEnv *object.Environment) (ob
 }
 
 func evalBuiltInPrint(callExpr *ast.Call, globalEnv *object.Environment) (object.Object, error) {
-	fn := buildPrint(callExpr, globalEnv)
+	if len(callExpr.Arguments) < 1 {
+		return nil, ErrLackParameter
+	}
 
 	var format string
 	var values []any
+
+	fn := buildPrint(callExpr, globalEnv)
 	for idx, param := range fn.Parameters {
 		v, err := Eval(callExpr.Arguments[idx], globalEnv)
 		if err != nil {
 			return nil, err
 		}
 
-		if param.Name == "format" {
-			format = v.(*object.String).Value
+		if param.Name == argFormat {
+			fmtVal, ok := v.(*object.String)
+			if !ok {
+				return nil, ErrInvalidParameterType
+			}
+
+			format = fmtVal.Value
 			continue
 		}
 

@@ -224,3 +224,39 @@ func TestMathOperator(t *testing.T) {
 		})
 	}
 }
+
+func TestLexerString(t *testing.T) {
+	input := `
+	let a = "abc"
+	`
+	lexer := NewLexer(input)
+	// for !lexer.isAtEnd() {
+	// 	token, err := lexer.NextToken()
+	// 	if err != nil {
+	// 		fmt.Println("lexer err: ", err)
+	// 		break
+	// 	}
+	// 	fmt.Printf("token: %+v\n", token)
+	// }
+
+	tests := []struct {
+		expectType tokens.TokenType
+		literal    string
+	}{
+		{tokens.LET, "let"},
+		{tokens.IDENT, "a"},
+		{tokens.ASSIGN, "="},
+		{tokens.STRING, "abc"},
+		{tokens.EOF, tokens.LiteralEOF},
+	}
+
+	for _, tt := range tests {
+		t.Run("test-"+tt.literal, func(t *testing.T) {
+			token, err := lexer.NextToken()
+
+			assert.Nil(t, err)
+			assert.Equal(t, tt.expectType, token.TkType)
+			assert.Equal(t, tt.literal, token.Literal)
+		})
+	}
+}

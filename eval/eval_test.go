@@ -635,3 +635,39 @@ func TestEvalBlock(t *testing.T) {
 		})
 	}
 }
+
+func TestEvalPrint(t *testing.T) {
+	type args struct {
+		input string
+	}
+
+	tests := []struct {
+		name    string
+		args    args
+		want    object.Object
+		wantErr bool
+	}{
+		{
+			name: "happy path",
+			args: args{
+				input: `
+				print("%d\n", 100)
+				`,
+			},
+			want:    nil,
+			wantErr: false,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			obj, err := testEvalInput(tt.args.input)
+			if tt.wantErr {
+				assert.NotNil(t, err)
+				return
+			}
+
+			assert.Equal(t, tt.want, obj)
+		})
+	}
+}
