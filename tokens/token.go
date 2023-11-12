@@ -7,6 +7,7 @@ import (
 
 const (
 	KWReturn = "return"
+	KWPrint  = "print"
 )
 
 var keywords = map[string]TokenType{
@@ -17,6 +18,7 @@ var keywords = map[string]TokenType{
 	KWReturn: RETURN,
 	"true":   TRUE,
 	"false":  FALSE,
+	KWPrint:  PRINT,
 	"null":   NIL,
 }
 
@@ -56,7 +58,7 @@ var keyword2Token = map[string]*Token{
 		Literal: "return",
 		Value:   "return",
 	},
-	"print": {
+	KWPrint: {
 		TkType:  PRINT,
 		Literal: "print",
 		Value:   "print",

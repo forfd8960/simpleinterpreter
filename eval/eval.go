@@ -93,11 +93,13 @@ func newError(format string, args ...interface{}) *object.Error {
 	}
 }
 
-func evalBockStmts(b *ast.Block, env *object.Environment) (object.Object, error) {
+func evalBockStmts(b *ast.Block, global *object.Environment) (object.Object, error) {
+	newStmtEnv := object.NewEnvWithOutter(global)
+
 	var obj object.Object
 	var err error
 	for _, stmt := range b.Statements {
-		obj, err = Eval(stmt, env)
+		obj, err = Eval(stmt, newStmtEnv)
 		if err != nil {
 			return nil, err
 		}
@@ -259,6 +261,10 @@ func evalUnary(node *ast.Unary, env *object.Environment) (object.Object, error) 
 }
 
 func evalCall(callExpr *ast.Call, globalEnv *object.Environment) (object.Object, error) {
+	if IsBuiltInFunction(callExpr.TokenLiteral()) {
+		return evalBuildInFunctions(callExpr, globalEnv)
+	}
+
 	// callExpr.Callee is a identifier, and after Eval, it should return a function object
 	callee, err := Eval(callExpr.Callee, globalEnv)
 	if err != nil {

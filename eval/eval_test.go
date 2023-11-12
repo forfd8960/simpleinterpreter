@@ -583,3 +583,55 @@ func TestStringCompare(t *testing.T) {
 	fmt.Printf("%t\n", s1 > s2)
 	assert.True(t, s1 > s2)
 }
+
+func TestGroupExpression(t *testing.T) {
+	var x = 100
+	{
+		var x = x + 10
+		fmt.Println("x: ", x)
+	}
+	assert.Equal(t, 100, x)
+}
+
+func TestEvalBlock(t *testing.T) {
+	type args struct {
+		input string
+	}
+
+	tests := []struct {
+		name    string
+		args    args
+		want    object.Object
+		wantErr bool
+	}{
+		{
+			name: "happy path",
+			args: args{
+				input: `
+				let a = 100;
+				{
+					let a = a + 10;
+					return a
+				}
+				`,
+			},
+			want:    &object.Integer{Value: int64(110)},
+			wantErr: false,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			obj, err := testEvalInput(tt.args.input)
+			if tt.wantErr {
+				assert.Nil(t, err)
+				assert.Equal(t, tt.want, obj)
+				return
+			}
+
+			if assert.NotNil(t, obj) {
+				assert.Equal(t, tt.want, obj)
+			}
+		})
+	}
+}
