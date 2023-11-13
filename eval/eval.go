@@ -204,25 +204,11 @@ func evalBinary(bin *ast.Binary, env *object.Environment) (object.Object, error)
 	case tokens.GT, tokens.GTEQ, tokens.LT, tokens.LTEQ, tokens.NOTEQUAL, tokens.EQUAL:
 		resul, err := compareObj(leftResult, rightResult, op)
 		return &object.Bool{Value: resul}, err
+	case tokens.PLUS:
+		return plusObj(leftResult, rightResult)
 	default:
-		leftValue := leftResult.(*object.Integer)
-		rightValue := rightResult.(*object.Integer)
-		switch op {
-		case tokens.PLUS:
-			return &object.Integer{Value: leftValue.Value + rightValue.Value}, nil
-		case tokens.MINUS:
-			return &object.Integer{Value: leftValue.Value - rightValue.Value}, nil
-		case tokens.ASTERISK:
-			return &object.Integer{Value: leftValue.Value * rightValue.Value}, nil
-		case tokens.SLASH:
-			if rightValue.Value == 0 {
-				return nil, fmt.Errorf(ErrDivideByZero)
-			}
-			return &object.Integer{Value: leftValue.Value / rightValue.Value}, nil
-		}
+		return doMath(leftResult, rightResult, op)
 	}
-
-	return nil, fmt.Errorf(ErrNotSupportedOperator, bin.Operator.Literal)
 }
 
 func compareObj(obj1, obj2 object.Object, op tokens.TokenType) (bool, error) {
@@ -242,6 +228,50 @@ func compareObj(obj1, obj2 object.Object, op tokens.TokenType) (bool, error) {
 	}
 
 	return false, fmt.Errorf("unsupported compare type:  %v, %v", obj1.Type(), obj2.Type())
+}
+
+func plusObj(obj1, obj2 object.Object) (object.Object, error) {
+	if obj1.Type() != obj2.Type() {
+		return nil, fmt.Errorf("can not plus 2 different type: %v, %v", obj1, obj2)
+	}
+
+	switch obj1.Type() {
+	case object.OBJ_INTEGER:
+		left, _ := obj1.(*object.Integer)
+		right, _ := obj2.(*object.Integer)
+		return &object.Integer{Value: left.Value + right.Value}, nil
+	case object.OBJ_STRING:
+		left, _ := obj1.(*object.String)
+		right, _ := obj2.(*object.String)
+		return &object.String{Value: left.Value + right.Value}, nil
+	}
+
+	return nil, fmt.Errorf("unsuported + for %s", obj1.Type())
+}
+
+func doMath(obj1, obj2 object.Object, op tokens.TokenType) (object.Object, error) {
+	leftValue, ok := obj1.(*object.Integer)
+	if !ok {
+		return nil, fmt.Errorf("%v must be number", obj1.Inspect())
+	}
+	rightValue, ok := obj2.(*object.Integer)
+	if !ok {
+		return nil, fmt.Errorf("%v must be number", obj2.Inspect())
+	}
+
+	switch op {
+	case tokens.MINUS:
+		return &object.Integer{Value: leftValue.Value - rightValue.Value}, nil
+	case tokens.ASTERISK:
+		return &object.Integer{Value: leftValue.Value * rightValue.Value}, nil
+	case tokens.SLASH:
+		if rightValue.Value == 0 {
+			return nil, fmt.Errorf(ErrDivideByZero)
+		}
+		return &object.Integer{Value: leftValue.Value / rightValue.Value}, nil
+	}
+
+	return nil, fmt.Errorf("unsupported operator: %s", op.String())
 }
 
 func evalUnary(node *ast.Unary, env *object.Environment) (object.Object, error) {
