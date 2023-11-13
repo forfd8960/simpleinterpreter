@@ -8,10 +8,12 @@ import (
 const (
 	KWReturn = "return"
 	KWPrint  = "print"
+	KWClass  = "class"
 )
 
 var keywords = map[string]TokenType{
 	"let":    LET,
+	KWClass:  CLASS,
 	"fn":     FUNCTION,
 	"if":     IF,
 	"else":   ELSE,
@@ -27,6 +29,11 @@ var keyword2Token = map[string]*Token{
 		TkType:  LET,
 		Literal: "let",
 		Value:   "let",
+	},
+	KWClass: {
+		TkType:  CLASS,
+		Literal: "class",
+		Value:   "class",
 	},
 	"fn": {
 		TkType:  FUNCTION,

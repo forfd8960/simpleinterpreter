@@ -76,6 +76,26 @@ func NewLetStmt(ident *tokens.Token, expr Expression) *LetStmt {
 	}
 }
 
+type ClassStmt struct {
+	NameIdent *Identifier
+	Methods   []*Function
+}
+
+func (ls *ClassStmt) StmtNode() {}
+func (ls *ClassStmt) TokenLiteral() string {
+	return tokens.CLASS.String()
+}
+
+func NewClassStmt(className *tokens.Token, methods []*Function) *ClassStmt {
+	return &ClassStmt{
+		NameIdent: &Identifier{
+			Token: className,
+			Name:  className.Literal,
+		},
+		Methods: methods,
+	}
+}
+
 type Assign struct {
 	Name  *tokens.Token
 	Value Expression

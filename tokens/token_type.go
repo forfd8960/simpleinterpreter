@@ -35,6 +35,7 @@ const (
 	LBRACE   // {
 	RBRACE   // }
 
+	CLASS    // class
 	FUNCTION // fn
 	LET      // let
 	IF       // if
