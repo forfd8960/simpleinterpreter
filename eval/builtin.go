@@ -17,16 +17,18 @@ var (
 	ErrInvalidParameterType = fmt.Errorf("invalid parameters for print(first paramter msut be string)")
 )
 
-var builtInfunctions = map[string]struct{}{
-	builtInPrint: {},
+var builtInfunctions = map[string]fnBuilder{
+	builtInPrint: buildPrint,
 }
+
+type fnBuilder func(callExpr *ast.Call, env *object.Environment) *object.Function
 
 func IsBuiltInFunction(fnName string) bool {
 	_, ok := builtInfunctions[fnName]
 	return ok
 }
 
-func buildPrint(callExpr *ast.Call, env *object.Environment) *object.Function {
+var buildPrint = func(callExpr *ast.Call, env *object.Environment) *object.Function {
 	identifiers := make([]*ast.Identifier, 0, len(callExpr.Arguments))
 	identifiers = append(identifiers, ast.NewIdentifier1(argFormat))
 
@@ -37,15 +39,6 @@ func buildPrint(callExpr *ast.Call, env *object.Environment) *object.Function {
 	return &object.Function{
 		Parameters: identifiers,
 	}
-}
-
-func evalBuildInFunctions(callExpr *ast.Call, globalEnv *object.Environment) (object.Object, error) {
-	switch callExpr.TokenLiteral() {
-	case builtInPrint:
-		return evalBuiltInPrint(callExpr, globalEnv)
-	}
-
-	return nil, nil
 }
 
 func evalBuiltInPrint(callExpr *ast.Call, globalEnv *object.Environment) (object.Object, error) {
@@ -73,9 +66,24 @@ func evalBuiltInPrint(callExpr *ast.Call, globalEnv *object.Environment) (object
 			continue
 		}
 
-		values = append(values, v)
+		values = append(values, getValueLiteral(v))
 	}
 
 	_, err := fmt.Printf(format, values...)
 	return nil, err
+}
+
+func getValueLiteral(v object.Object) any {
+	switch data := v.(type) {
+	case *object.Integer:
+		return data.Value
+	case *object.String:
+		return data.Value
+	case *object.Bool:
+		return data.Value
+	case *object.Null:
+		return nil
+	default:
+		return data
+	}
 }

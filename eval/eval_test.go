@@ -657,6 +657,19 @@ func TestEvalPrint(t *testing.T) {
 			want:    nil,
 			wantErr: false,
 		},
+		{
+			name: "happy path",
+			args: args{
+				input: `
+				fn add(x, y) {
+					return x + y;
+				}
+				print("%d\n", add(10, 10));
+				`,
+			},
+			want:    nil,
+			wantErr: false,
+		},
 	}
 
 	for _, tt := range tests {
