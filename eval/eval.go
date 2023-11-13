@@ -35,6 +35,8 @@ func Eval(node ast.Node, env *object.Environment) (object.Object, error) {
 		return evalIfStmt(v, env)
 	case *ast.ReturnStmt:
 		return evalReturn(v, env)
+	case *ast.PrintStmt:
+		return evalPrintStmt(v, env)
 	case *ast.ExpressionStmt:
 		return Eval(v.Expr, env)
 	case *ast.Grouping:
@@ -157,6 +159,13 @@ func evalReturn(v *ast.ReturnStmt, env *object.Environment) (object.Object, erro
 	}
 
 	return &object.Return{Value: result}, nil
+}
+
+func evalPrintStmt(v *ast.PrintStmt, env *object.Environment) (object.Object, error) {
+	return evalBuiltInPrint(
+		ast.NewCall(v, v.Values),
+		env,
+	)
 }
 
 func evalGroup(g *ast.Grouping, env *object.Environment) (object.Object, error) {

@@ -78,17 +78,18 @@ func (ift *IFStmt) TokenLiteral() string {
 }
 
 type PrintStmt struct {
-	value Expression
+	Values []Expression
 }
 
-func NewPrintStmt(e Expression) *PrintStmt {
-	return &PrintStmt{value: e}
+func NewPrintStmt(exps []Expression) *PrintStmt {
+	return &PrintStmt{Values: exps}
 }
 
 func (pt *PrintStmt) StmtNode() {}
 func (pt *PrintStmt) TokenLiteral() string {
 	return "print"
 }
+func (pt *PrintStmt) ExprNode() {}
 
 type WhileStmt struct {
 	Condition Expression

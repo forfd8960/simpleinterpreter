@@ -97,6 +97,16 @@ func (ret *Return) Type() ObjectType {
 	return OBJ_RETURN
 }
 
+type Print struct {
+}
+
+func (ret *Print) Inspect() string {
+	return "print"
+}
+func (ret *Print) Type() ObjectType {
+	return OBJ_RETURN
+}
+
 type Error struct {
 	Message string
 }

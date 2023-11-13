@@ -97,9 +97,9 @@ func TestWhileStmt(t *testing.T) {
 
 func TestIFStmt(t *testing.T) {
 	input := `if (1 <= 2) {
-		print(1);
+		print("%d", 1);
 	} else {
-		print(22);
+		print("%d", 22);
 	}`
 	tokenList, err := lexer.TokensFromInput(input)
 	assert.Nil(t, err)
@@ -130,21 +130,24 @@ func TestIFStmt(t *testing.T) {
 					),
 				),
 				ast.NewBlockStmt([]ast.Stmt{
-					ast.NewPrintStmt(
-						ast.NewGrouping(
-							ast.NewLiteral(
-								tokens.NewToken(tokens.INTEGER, "1", int64(1)),
-							),
+					ast.NewPrintStmt([]ast.Expression{
+						ast.NewLiteral(
+							tokens.NewToken(tokens.STRING, "%d", "%d"),
 						),
-					),
+						ast.NewLiteral(
+							tokens.NewToken(tokens.INTEGER, "1", int64(1)),
+						),
+					}),
 				}),
 				ast.NewBlockStmt([]ast.Stmt{
-					ast.NewPrintStmt(
-						ast.NewGrouping(
-							ast.NewLiteral(
-								tokens.NewToken(tokens.INTEGER, "22", int64(22)),
-							),
+					ast.NewPrintStmt([]ast.Expression{
+						ast.NewLiteral(
+							tokens.NewToken(tokens.STRING, "%d", "%d"),
 						),
+						ast.NewLiteral(
+							tokens.NewToken(tokens.INTEGER, "22", int64(22)),
+						),
+					},
 					),
 				}),
 			),

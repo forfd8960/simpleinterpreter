@@ -261,13 +261,37 @@ func (p *Parser) ifStatement() (ast.Stmt, error) {
 
 // printStatement
 func (p *Parser) printStatement() (ast.Stmt, error) {
-	value, err := p.parseExpr()
+	if _, err := p.consume(tokens.LPRARENT, "Expect `(` after print."); err != nil {
+		return nil, err
+	}
+
+	values := []ast.Expression{}
+	format, err := p.parseExpr()
 	if err != nil {
 		return nil, err
 	}
 
-	p.consume(tokens.SEMICOLON, `Expect ":" after value.`)
-	return ast.NewPrintStmt(value), nil
+	values = append(values, format)
+	for {
+		if !p.match(tokens.COMMA) {
+			break
+		}
+
+		v, err := p.parseExpr()
+		if err != nil {
+			return nil, err
+		}
+		values = append(values, v)
+	}
+
+	if _, err := p.consume(tokens.RPARENT, `Expect ) after print`); err != nil {
+		return nil, err
+	}
+
+	if _, err := p.consume(tokens.SEMICOLON, `Expect ";" after print()`); err != nil {
+		return nil, err
+	}
+	return ast.NewPrintStmt(values), nil
 }
 
 // whileStatement

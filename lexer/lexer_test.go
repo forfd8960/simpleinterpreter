@@ -227,7 +227,7 @@ func TestMathOperator(t *testing.T) {
 
 func TestLexerString(t *testing.T) {
 	input := `
-	let a = "abc"
+	let a = "abc";
 	`
 	lexer := NewLexer(input)
 	// for !lexer.isAtEnd() {
@@ -247,6 +247,7 @@ func TestLexerString(t *testing.T) {
 		{tokens.IDENT, "a"},
 		{tokens.ASSIGN, "="},
 		{tokens.STRING, "abc"},
+		{tokens.SEMICOLON, ";"},
 		{tokens.EOF, tokens.LiteralEOF},
 	}
 
