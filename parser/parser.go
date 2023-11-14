@@ -60,6 +60,8 @@ func (p *Parser) declaration() (ast.Stmt, error) {
 		return p.parseLetStmt()
 	case p.match(tokens.FUNCTION):
 		return p.function()
+	case p.match(tokens.CLASS):
+		return p.parseClassStmt()
 	default:
 		return p.statement()
 	}
@@ -84,6 +86,29 @@ func (p *Parser) parseLetStmt() (ast.Stmt, error) {
 	}
 
 	return ast.NewLetStmt(identToken, initExpr), nil
+}
+
+func (p *Parser) parseClassStmt() (*ast.ClassStmt, error) {
+	className, err := p.consume(tokens.IDENT, "expect class name")
+	if err != nil {
+		return nil, err
+	}
+
+	if _, err := p.consume(tokens.LBRACE, "expect { before class body"); err != nil {
+		return nil, err
+	}
+
+	var methods = []*ast.Function{}
+	for !p.isAtEnd() && !p.check(tokens.RBRACE) {
+		fn, err := p.function()
+		if err != nil {
+			return nil, err
+		}
+
+		methods = append(methods, fn)
+	}
+
+	return ast.NewClassStmt(className, methods), nil
 }
 
 // Todo: anonymous functions
