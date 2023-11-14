@@ -14,6 +14,20 @@ type Object interface {
 	Inspect() string
 }
 
+type Class struct {
+	Name    string
+	Methods []*Function
+	Env     *Environment
+}
+
+func (cls *Class) Inspect() string {
+	return cls.Name
+}
+
+func (cls *Class) Type() ObjectType {
+	return OBJ_CLASS
+}
+
 type Function struct {
 	Parameters []*ast.Identifier
 	Body       *ast.Block

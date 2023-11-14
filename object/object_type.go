@@ -1,6 +1,7 @@
 package object
 
 const (
+	OBJ_CLASS    ObjectType = "CLASS"
 	OBJ_FUNCTION ObjectType = "FUNCTION"
 	OBJ_INTEGER  ObjectType = "INTEGER"
 	OBJ_BOOL     ObjectType = "BOOL"

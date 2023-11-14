@@ -23,6 +23,8 @@ func Eval(node ast.Node, env *object.Environment) (object.Object, error) {
 	switch v := node.(type) {
 	case *ast.Program:
 		return evalStatements(v.Stmts, env)
+	case *ast.ClassStmt:
+		return evalClassStmt(v, env)
 	case *ast.Function:
 		return evalFunctionStmt(v, env)
 	case *ast.Block:
@@ -71,8 +73,26 @@ func evalStatements(nodes []ast.Stmt, env *object.Environment) (object.Object, e
 	return result, nil
 }
 
+func evalClassStmt(cls *ast.ClassStmt, env *object.Environment) (*object.Class, error) {
+	objCls := &object.Class{
+		Name: cls.NameIdent.Name,
+		Env:  object.NewEnvWithOutter(env),
+	}
+
+	for _, fn := range cls.Methods {
+		objFn, err := evalFunctionStmt(fn, objCls.Env)
+		if err != nil {
+			return nil, err
+		}
+
+		objCls.Methods = append(objCls.Methods, objFn)
+	}
+
+	return objCls, nil
+}
+
 // Todo: anonymous functions
-func evalFunctionStmt(astFn *ast.Function, env *object.Environment) (object.Object, error) {
+func evalFunctionStmt(astFn *ast.Function, env *object.Environment) (*object.Function, error) {
 	params := make([]*ast.Identifier, 0, len(astFn.Parameters))
 	for _, token := range astFn.Parameters {
 		params = append(params, ast.NewIdentifier(token))
