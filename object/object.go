@@ -16,7 +16,7 @@ type Object interface {
 
 type Class struct {
 	Name    string
-	Methods []*Function
+	Methods map[string]*Function
 	Env     *Environment
 }
 

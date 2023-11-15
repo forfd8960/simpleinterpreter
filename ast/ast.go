@@ -46,7 +46,7 @@ func NewIdentifier(name *tokens.Token) *Identifier {
 func NewIdentifier1(name string) *Identifier {
 	return &Identifier{
 		Name:  name,
-		Token: tokens.NewToken(tokens.STRING, name, name),
+		Token: tokens.NewToken(tokens.IDENT, name, name),
 	}
 }
 

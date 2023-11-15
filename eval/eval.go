@@ -75,8 +75,9 @@ func evalStatements(nodes []ast.Stmt, env *object.Environment) (object.Object, e
 
 func evalClassStmt(cls *ast.ClassStmt, env *object.Environment) (*object.Class, error) {
 	objCls := &object.Class{
-		Name: cls.NameIdent.Name,
-		Env:  object.NewEnvWithOutter(env),
+		Name:    cls.NameIdent.Name,
+		Methods: make(map[string]*object.Function),
+		Env:     object.NewEnvWithOutter(env),
 	}
 
 	for _, fn := range cls.Methods {
@@ -85,7 +86,7 @@ func evalClassStmt(cls *ast.ClassStmt, env *object.Environment) (*object.Class, 
 			return nil, err
 		}
 
-		objCls.Methods = append(objCls.Methods, objFn)
+		objCls.Methods[fn.Name.Literal] = objFn
 	}
 
 	// store class object into env

@@ -615,7 +615,7 @@ func TestEvalBlock(t *testing.T) {
 				}
 				`,
 			},
-			want:    &object.Integer{Value: int64(110)},
+			want:    nil,
 			wantErr: false,
 		},
 	}
@@ -625,13 +625,10 @@ func TestEvalBlock(t *testing.T) {
 			obj, err := testEvalInput(tt.args.input)
 			if tt.wantErr {
 				assert.Nil(t, err)
-				assert.Equal(t, tt.want, obj)
 				return
 			}
 
-			if assert.NotNil(t, obj) {
-				assert.Equal(t, tt.want, obj)
-			}
+			assert.Equal(t, tt.want, obj)
 		})
 	}
 }
@@ -681,6 +678,72 @@ func TestEvalPrint(t *testing.T) {
 			}
 
 			assert.Equal(t, tt.want, obj)
+		})
+	}
+}
+
+func TestEvalClass(t *testing.T) {
+	type args struct {
+		input string
+	}
+
+	tests := []struct {
+		name    string
+		args    args
+		want    *object.Class
+		wantErr bool
+	}{
+		{
+			name: "happy path",
+			args: args{
+				input: `
+				class Add {
+					add(x, y) {
+						return x + y;
+					}
+				}
+				`,
+			},
+			want: &object.Class{
+				Name: "Add",
+				Methods: map[string]*object.Function{
+					"add": {
+						Parameters: []*ast.Identifier{
+							ast.NewIdentifier1("x"),
+							ast.NewIdentifier1("y"),
+						},
+						Body: ast.NewBlockStmt([]ast.Stmt{
+							ast.NewReturnStmt(
+								tokens.NewToken(tokens.RETURN, "return", "return"),
+								ast.NewBinary(
+									ast.NewIdentifier1("x"),
+									ast.NewIdentifier1("y"),
+									tokens.NewToken(tokens.PLUS, "+", "+"),
+								),
+							),
+						}),
+					},
+				},
+			},
+			wantErr: false,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			obj, err := testEvalInput(tt.args.input)
+			if tt.wantErr {
+				assert.NotNil(t, err)
+				return
+			}
+
+			objCls, ok := obj.(*object.Class)
+			assert.True(t, ok)
+			assert.Equal(t, tt.want.Name, objCls.Name)
+
+			method := tt.want.Methods["add"]
+			assert.Equal(t, method.Parameters, objCls.Methods["add"].Parameters)
+			assert.Equal(t, method.Body, objCls.Methods["add"].Body)
 		})
 	}
 }

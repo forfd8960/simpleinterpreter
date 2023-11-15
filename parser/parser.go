@@ -108,6 +108,10 @@ func (p *Parser) parseClassStmt() (*ast.ClassStmt, error) {
 		methods = append(methods, fn)
 	}
 
+	if _, err := p.consume(tokens.RBRACE, "expect } after class body"); err != nil {
+		return nil, err
+	}
+
 	return ast.NewClassStmt(className, methods), nil
 }
 
