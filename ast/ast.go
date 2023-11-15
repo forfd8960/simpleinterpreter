@@ -172,6 +172,23 @@ func (call *Call) TokenLiteral() string {
 	return call.Callee.TokenLiteral()
 }
 
+type Get struct {
+	Expr Expression
+	Name *tokens.Token
+}
+
+func NewGet(expr Expression, name *tokens.Token) *Get {
+	return &Get{
+		Expr: expr,
+		Name: name,
+	}
+}
+
+func (get *Get) ExprNode() {}
+func (get *Get) TokenLiteral() string {
+	return get.Expr.TokenLiteral()
+}
+
 type Literal struct {
 	Value *tokens.Token
 }

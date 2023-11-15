@@ -533,10 +533,20 @@ func (p *Parser) call() (ast.Expression, error) {
 		return nil, err
 	}
 
-	for p.match(tokens.LPRARENT) {
-		expr, err = p.finishCall(expr)
-		if err != nil {
-			return nil, err
+	for {
+		if p.match(tokens.LPRARENT) {
+			expr, err = p.finishCall(expr)
+			if err != nil {
+				return nil, err
+			}
+		} else if p.match(tokens.DOT) {
+			name, err := p.consume(tokens.IDENT, "Expect property name after .")
+			if err != nil {
+				return nil, err
+			}
+			expr = ast.NewGet(expr, name)
+		} else {
+			break
 		}
 	}
 

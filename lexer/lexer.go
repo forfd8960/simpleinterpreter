@@ -103,6 +103,8 @@ func (l *Lexer) scanToken() (*tokens.Token, error) {
 		tok = l.buildToken(tokens.RBRACE, "}")
 	case '"':
 		tok, err = l.parseString()
+	case '.':
+		tok = l.buildToken(tokens.DOT, ".")
 	default:
 		if isDigit(r) {
 			tok, err = l.parseInteger()

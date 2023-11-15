@@ -747,3 +747,76 @@ func TestEvalClass(t *testing.T) {
 		})
 	}
 }
+
+func TestEvalCallClass(t *testing.T) {
+	type args struct {
+		input string
+	}
+
+	tests := []struct {
+		name    string
+		args    args
+		want    *object.ClassInstance
+		wantErr bool
+	}{
+		{
+			name: "happy path",
+			args: args{
+				input: `
+				class Add {
+					add(x, y) {
+						return x + y;
+					}
+				}
+				let add_obj = Add();
+				return add_obj;
+				`,
+			},
+			want: &object.ClassInstance{
+				Cls: &object.Class{
+					Name: "Add",
+					Methods: map[string]*object.Function{
+						"add": {
+							Parameters: []*ast.Identifier{
+								ast.NewIdentifier1("x"),
+								ast.NewIdentifier1("y"),
+							},
+							Body: ast.NewBlockStmt([]ast.Stmt{
+								ast.NewReturnStmt(
+									tokens.NewToken(tokens.RETURN, "return", "return"),
+									ast.NewBinary(
+										ast.NewIdentifier1("x"),
+										ast.NewIdentifier1("y"),
+										tokens.NewToken(tokens.PLUS, "+", "+"),
+									),
+								),
+							}),
+						},
+					},
+				},
+			},
+			wantErr: false,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			obj, err := testEvalInput(tt.args.input)
+			if tt.wantErr {
+				assert.NotNil(t, err)
+				return
+			}
+
+			clsObj, ok := obj.(*object.ClassInstance)
+			assert.True(t, ok)
+			assert.Equal(t, tt.want.Cls.Name, clsObj.Cls.Name)
+
+			cls := tt.want.Cls
+			resultCls := clsObj.Cls
+
+			method := cls.Methods["add"]
+			assert.Equal(t, method.Parameters, resultCls.Methods["add"].Parameters)
+			assert.Equal(t, method.Body, resultCls.Methods["add"].Body)
+		})
+	}
+}

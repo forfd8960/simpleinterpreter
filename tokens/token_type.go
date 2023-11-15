@@ -29,6 +29,7 @@ const (
 
 	COMMA     // ,
 	SEMICOLON // ;
+	DOT       // .
 
 	LPRARENT // (
 	RPARENT  // )
