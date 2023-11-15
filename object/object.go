@@ -28,6 +28,18 @@ func (cls *Class) Type() ObjectType {
 	return OBJ_CLASS
 }
 
+type ClassInstance struct {
+	Cls *Class
+}
+
+func (instance *ClassInstance) Inspect() string {
+	return instance.Cls.Name + ":instance"
+}
+
+func (instance *ClassInstance) Type() ObjectType {
+	return OBJ_CLASS_INSTANCE
+}
+
 type Function struct {
 	Parameters []*ast.Identifier
 	Body       *ast.Block

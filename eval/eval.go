@@ -88,6 +88,9 @@ func evalClassStmt(cls *ast.ClassStmt, env *object.Environment) (*object.Class, 
 		objCls.Methods = append(objCls.Methods, objFn)
 	}
 
+	// store class object into env
+	env.Set(objCls.Name, objCls)
+
 	return objCls, nil
 }
 
@@ -326,11 +329,23 @@ func evalCall(callExpr *ast.Call, globalEnv *object.Environment) (object.Object,
 		return nil, err
 	}
 
-	fn, ok := callee.(*object.Function)
-	if !ok {
-		return nil, fmt.Errorf(ErrIdentifierIsNotCallable, callee.Inspect())
+	switch v := callee.(type) {
+	case *object.Class:
+		return evalCallClass(v, callExpr, globalEnv)
+	case *object.Function:
+		return evalCallFunction(v, callExpr, globalEnv)
 	}
 
+	return nil, fmt.Errorf(ErrIdentifierIsNotCallable, callee.Inspect())
+}
+
+func evalCallClass(cls *object.Class, callExpr *ast.Call, globalEnv *object.Environment) (object.Object, error) {
+	return &object.ClassInstance{
+		Cls: cls,
+	}, nil
+}
+
+func evalCallFunction(fn *object.Function, callExpr *ast.Call, globalEnv *object.Environment) (object.Object, error) {
 	if len(fn.Parameters) != len(callExpr.Arguments) {
 		return nil, fmt.Errorf("not engough params to function: %s, need %d arguments", fn.Inspect(), len(fn.Parameters))
 	}
