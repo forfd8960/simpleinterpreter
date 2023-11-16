@@ -391,8 +391,11 @@ func (p *Parser) assignment() (ast.Expression, error) {
 			return nil, err
 		}
 
-		if v, ok := exp.(*ast.Identifier); ok {
-			return ast.NewAssign(v.Token, value), nil
+		switch v := exp.(type) {
+		case *ast.Assign:
+			return ast.NewAssign(v.Name, value), nil
+		case *ast.Get:
+			return ast.NewSet(v.Expr, v.Name, value), nil
 		}
 
 		return nil, fmt.Errorf("invalid assignment: %v", equals)

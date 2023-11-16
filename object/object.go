@@ -55,6 +55,10 @@ func (instance *ClassInstance) Get(name *tokens.Token) (Object, error) {
 	return v, nil
 }
 
+func (instance *ClassInstance) Set(name *tokens.Token, value Object) {
+	instance.Fields[name.Literal] = value
+}
+
 func (instance *ClassInstance) Inspect() string {
 	return instance.Cls.Name + ":instance"
 }

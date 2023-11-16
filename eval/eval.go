@@ -52,8 +52,10 @@ func Eval(node ast.Node, env *object.Environment) (object.Object, error) {
 		return evalUnary(v, env)
 	case *ast.Call:
 		return evalCall(v, env)
-	case *ast.Get:
+	case *ast.Get: // classObj.property
 		return evalGetStmt(v, env)
+	case *ast.Set: // classObj.property = value
+		return evalSetStmt(v, env)
 	}
 
 	return nil, nil
@@ -395,6 +397,26 @@ func evalGetStmt(get *ast.Get, env *object.Environment) (object.Object, error) {
 	}
 
 	return v, nil
+}
+
+func evalSetStmt(set *ast.Set, env *object.Environment) (object.Object, error) {
+	obj, err := Eval(set.Expr, env)
+	if err != nil {
+		return nil, err
+	}
+
+	clsInstance, ok := obj.(*object.ClassInstance)
+	if !ok {
+		return nil, fmt.Errorf("obj: %s is not class instance, only instance has fields")
+	}
+
+	value, err := Eval(set.Value, env)
+	if err != nil {
+		return nil, err
+	}
+
+	clsInstance.Set(set.Name, value)
+	return value, nil
 }
 
 func evalLiteralInteger(value interface{}) (*object.Integer, error) {
