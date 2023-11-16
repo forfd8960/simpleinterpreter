@@ -189,6 +189,26 @@ func (get *Get) TokenLiteral() string {
 	return get.Expr.TokenLiteral()
 }
 
+// Set classIsntance.Property = value
+type Set struct {
+	Expr  Expression    // class instance
+	Name  *tokens.Token // property name
+	Value Expression    // property value
+}
+
+func NewSet(expr Expression, name *tokens.Token, value Expression) *Set {
+	return &Set{
+		Expr:  expr,
+		Name:  name,
+		Value: value,
+	}
+}
+
+func (set *Set) ExprNode() {}
+func (set *Set) TokenLiteral() string {
+	return set.Expr.TokenLiteral() + "." + set.Name.Literal + " = " + set.Value.TokenLiteral()
+}
+
 type Literal struct {
 	Value *tokens.Token
 }

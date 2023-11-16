@@ -384,12 +384,12 @@ func evalGetStmt(get *ast.Get, env *object.Environment) (object.Object, error) {
 		return nil, err
 	}
 
-	clsObj, ok := instanceObj.(*object.ClassInstance)
+	clsInst, ok := instanceObj.(*object.ClassInstance)
 	if !ok {
 		return nil, fmt.Errorf(ErrOnlyClassInstanceHaveProperty, instanceObj.Inspect())
 	}
 
-	v, err := clsObj.Get(get.Name)
+	v, err := clsInst.Get(get.Name)
 	if err != nil {
 		return nil, err
 	}
