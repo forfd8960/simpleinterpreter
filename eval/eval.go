@@ -9,14 +9,15 @@ import (
 )
 
 var (
-	ErrNodeNotLiteral          = "node: %v is not literal"
-	ErrNotIntegerValue         = "value: %v is not integer"
-	ErrNotBoolValue            = "value: %v is not boolean"
-	ErrNotStringValue          = "value: %v is not string"
-	ErrDivideByZero            = "integer divide by zero"
-	ErrNotSupportedOperator    = "operator is not supported: %v"
-	ErrIdentifierNotFound      = "identifier: %s is not found"
-	ErrIdentifierIsNotCallable = "%s is not callable(it shoud be function or xxx)"
+	ErrNodeNotLiteral                = "node: %v is not literal"
+	ErrNotIntegerValue               = "value: %v is not integer"
+	ErrNotBoolValue                  = "value: %v is not boolean"
+	ErrNotStringValue                = "value: %v is not string"
+	ErrDivideByZero                  = "integer divide by zero"
+	ErrNotSupportedOperator          = "operator is not supported: %v"
+	ErrIdentifierNotFound            = "identifier: %s is not found"
+	ErrIdentifierIsNotCallable       = "%s is not callable(it shoud be function or xxx)"
+	ErrOnlyClassInstanceHaveProperty = "expr: %s can not get property, only class instance have property"
 )
 
 func Eval(node ast.Node, env *object.Environment) (object.Object, error) {
@@ -51,6 +52,8 @@ func Eval(node ast.Node, env *object.Environment) (object.Object, error) {
 		return evalUnary(v, env)
 	case *ast.Call:
 		return evalCall(v, env)
+	case *ast.Get:
+		return evalGetStmt(v, env)
 	}
 
 	return nil, nil
@@ -341,9 +344,7 @@ func evalCall(callExpr *ast.Call, globalEnv *object.Environment) (object.Object,
 }
 
 func evalCallClass(cls *object.Class, callExpr *ast.Call, globalEnv *object.Environment) (object.Object, error) {
-	return &object.ClassInstance{
-		Cls: cls,
-	}, nil
+	return object.NewClassInstance(cls), nil
 }
 
 func evalCallFunction(fn *object.Function, callExpr *ast.Call, globalEnv *object.Environment) (object.Object, error) {
@@ -375,6 +376,25 @@ func evalCallFunction(fn *object.Function, callExpr *ast.Call, globalEnv *object
 		result = v.Value
 	}
 	return result, nil
+}
+
+func evalGetStmt(get *ast.Get, env *object.Environment) (object.Object, error) {
+	instanceObj, err := Eval(get.Expr, env)
+	if err != nil {
+		return nil, err
+	}
+
+	clsObj, ok := instanceObj.(*object.ClassInstance)
+	if !ok {
+		return nil, fmt.Errorf(ErrOnlyClassInstanceHaveProperty, instanceObj.Inspect())
+	}
+
+	v, err := clsObj.Get(get.Name)
+	if err != nil {
+		return nil, err
+	}
+
+	return v, nil
 }
 
 func evalLiteralInteger(value interface{}) (*object.Integer, error) {

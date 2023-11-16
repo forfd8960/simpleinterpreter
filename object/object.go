@@ -1,10 +1,16 @@
 package object
 
 import (
+	"fmt"
 	"strconv"
 	"strings"
 
 	"github.com/forfd8960/simpleinterpreter/ast"
+	"github.com/forfd8960/simpleinterpreter/tokens"
+)
+
+var (
+	ErrPropertyNotFound = "property: %s not found for instance: %s"
 )
 
 type ObjectType string
@@ -29,7 +35,24 @@ func (cls *Class) Type() ObjectType {
 }
 
 type ClassInstance struct {
-	Cls *Class
+	Cls    *Class
+	Fields map[string]Object
+}
+
+func NewClassInstance(cls *Class) *ClassInstance {
+	return &ClassInstance{
+		Cls:    cls,
+		Fields: make(map[string]Object),
+	}
+}
+
+func (instance *ClassInstance) Get(name *tokens.Token) (Object, error) {
+	v, ok := instance.Fields[name.Literal]
+	if !ok {
+		return nil, fmt.Errorf(ErrPropertyNotFound, name.Literal, instance.Inspect())
+	}
+
+	return v, nil
 }
 
 func (instance *ClassInstance) Inspect() string {
