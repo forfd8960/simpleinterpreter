@@ -34,6 +34,19 @@ func (cls *Class) Type() ObjectType {
 	return OBJ_CLASS
 }
 
+func NewClass(name string, methods map[string]*Function, env *Environment) *Class {
+	return &Class{
+		Name:    name,
+		Methods: methods,
+		Env:     env,
+	}
+}
+
+func (cls *Class) findMethod(name string) (*Function, bool) {
+	fn, ok := cls.Methods[name]
+	return fn, ok
+}
+
 type ClassInstance struct {
 	Cls    *Class
 	Fields map[string]Object
@@ -48,11 +61,16 @@ func NewClassInstance(cls *Class) *ClassInstance {
 
 func (instance *ClassInstance) Get(name *tokens.Token) (Object, error) {
 	v, ok := instance.Fields[name.Literal]
-	if !ok {
-		return nil, fmt.Errorf(ErrPropertyNotFound, name.Literal, instance.Inspect())
+	if ok {
+		return v, nil
 	}
 
-	return v, nil
+	method, methodOk := instance.Cls.findMethod(name.Literal)
+	if methodOk {
+		return method, nil
+	}
+
+	return nil, fmt.Errorf(ErrPropertyNotFound, name.Literal, instance.Inspect())
 }
 
 func (instance *ClassInstance) Set(name *tokens.Token, value Object) {

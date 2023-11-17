@@ -44,6 +44,9 @@ func Start(in io.Reader, out io.Writer) {
 			continue
 		}
 
-		fmt.Printf("eval result: %v\n", result.Inspect())
+		fmt.Printf("eval result: %+v\n", result)
+		if result != nil {
+			fmt.Printf("eval result: %s\n", result.Inspect())
+		}
 	}
 }

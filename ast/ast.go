@@ -78,7 +78,7 @@ func NewLetStmt(ident *tokens.Token, expr Expression) *LetStmt {
 
 type ClassStmt struct {
 	NameIdent *Identifier
-	Methods   []*Function
+	Methods   map[string]*Function
 }
 
 func (ls *ClassStmt) StmtNode() {}
@@ -87,13 +87,19 @@ func (ls *ClassStmt) TokenLiteral() string {
 }
 
 func NewClassStmt(className *tokens.Token, methods []*Function) *ClassStmt {
-	return &ClassStmt{
+	cls := &ClassStmt{
 		NameIdent: &Identifier{
 			Token: className,
 			Name:  className.Literal,
 		},
-		Methods: methods,
+		Methods: make(map[string]*Function),
 	}
+
+	for _, mth := range methods {
+		cls.Methods[mth.Name.Literal] = mth
+	}
+
+	return cls
 }
 
 type Assign struct {

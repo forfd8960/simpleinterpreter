@@ -79,25 +79,21 @@ func evalStatements(nodes []ast.Stmt, env *object.Environment) (object.Object, e
 }
 
 func evalClassStmt(cls *ast.ClassStmt, env *object.Environment) (*object.Class, error) {
-	objCls := &object.Class{
-		Name:    cls.NameIdent.Name,
-		Methods: make(map[string]*object.Function),
-		Env:     object.NewEnvWithOutter(env),
-	}
-
+	methods := make(map[string]*object.Function, len(cls.Methods))
 	for _, fn := range cls.Methods {
-		objFn, err := evalFunctionStmt(fn, objCls.Env)
+		method, err := evalFunctionStmt(fn, env)
 		if err != nil {
 			return nil, err
 		}
 
-		objCls.Methods[fn.Name.Literal] = objFn
+		methods[fn.Name.Literal] = method
 	}
 
+	clsObj := object.NewClass(cls.NameIdent.Name, methods, object.NewEnvWithOutter(env))
 	// store class object into env
-	env.Set(objCls.Name, objCls)
+	env.Set(clsObj.Name, clsObj)
 
-	return objCls, nil
+	return clsObj, nil
 }
 
 // Todo: anonymous functions
@@ -372,11 +368,15 @@ func evalCallFunction(fn *object.Function, callExpr *ast.Call, globalEnv *object
 		return nil, err
 	}
 
-	result := obj
-	for result.Type() == object.OBJ_RETURN {
-		v := result.(*object.Return)
-		result = v.Value
+	var result object.Object
+	if obj != nil {
+		result = obj
+		for result.Type() == object.OBJ_RETURN {
+			v := result.(*object.Return)
+			result = v.Value
+		}
 	}
+
 	return result, nil
 }
 
@@ -407,7 +407,7 @@ func evalSetStmt(set *ast.Set, env *object.Environment) (object.Object, error) {
 
 	clsInstance, ok := obj.(*object.ClassInstance)
 	if !ok {
-		return nil, fmt.Errorf("obj: %s is not class instance, only instance has fields")
+		return nil, fmt.Errorf("obj: %s is not class instance, only instance has fields", obj.Inspect())
 	}
 
 	value, err := Eval(set.Value, env)
