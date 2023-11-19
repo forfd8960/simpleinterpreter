@@ -9,11 +9,13 @@ const (
 	KWReturn = "return"
 	KWPrint  = "print"
 	KWClass  = "class"
+	KWThis   = "this"
 )
 
 var keywords = map[string]TokenType{
 	"let":    LET,
 	KWClass:  CLASS,
+	KWThis:   THIS,
 	"fn":     FUNCTION,
 	"if":     IF,
 	"else":   ELSE,
@@ -34,6 +36,11 @@ var keyword2Token = map[string]*Token{
 		TkType:  CLASS,
 		Literal: "class",
 		Value:   "class",
+	},
+	KWThis: {
+		TkType:  THIS,
+		Literal: "this",
+		Value:   "this",
 	},
 	"fn": {
 		TkType:  FUNCTION,

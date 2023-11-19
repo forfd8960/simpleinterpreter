@@ -568,6 +568,8 @@ func (p *Parser) primary() (ast.Expression, error) {
 		return ast.NewLiteral(p.previous()), nil
 	case p.match(tokens.IDENT):
 		return ast.NewIdentifier(p.previous()), nil
+	case p.match(tokens.THIS):
+		return ast.NewThisStmt(p.previous()), nil
 	case p.match(tokens.LPRARENT):
 		exp, err := p.parseExpr()
 		if err != nil {

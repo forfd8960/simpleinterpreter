@@ -102,6 +102,22 @@ func NewClassStmt(className *tokens.Token, methods []*Function) *ClassStmt {
 	return cls
 }
 
+type ThisStmt struct {
+	keyword *tokens.Token
+}
+
+func NewThisStmt(kw *tokens.Token) *ThisStmt {
+	return &ThisStmt{
+		keyword: kw,
+	}
+}
+
+func (this *ThisStmt) StmtNode() {}
+func (this *ThisStmt) ExprNode() {}
+func (this *ThisStmt) TokenLiteral() string {
+	return this.keyword.Literal
+}
+
 type Assign struct {
 	Name  *tokens.Token
 	Value Expression

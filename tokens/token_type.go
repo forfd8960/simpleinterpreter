@@ -37,6 +37,7 @@ const (
 	RBRACE   // }
 
 	CLASS    // class
+	THIS     // this
 	FUNCTION // fn
 	LET      // let
 	IF       // if
