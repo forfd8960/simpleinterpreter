@@ -67,7 +67,9 @@ func (instance *ClassInstance) Get(name *tokens.Token) (Object, error) {
 
 	method, methodOk := instance.Cls.findMethod(name.Literal)
 	if methodOk {
-		return method, nil
+		// We create a new environment nestled inside the method’s original closure.
+		// When the method is called, that will become the parent of the method body’s environment.
+		return method.bind(instance), nil
 	}
 
 	return nil, fmt.Errorf(ErrPropertyNotFound, name.Literal, instance.Inspect())
@@ -89,6 +91,16 @@ type Function struct {
 	Parameters []*ast.Identifier
 	Body       *ast.Block
 	Env        *Environment
+}
+
+func (fn *Function) bind(instance *ClassInstance) *Function {
+	newEnv := NewEnvWithOutter(fn.Env)
+	newEnv.Set("this", instance)
+	return &Function{
+		Parameters: fn.Parameters,
+		Body:       fn.Body,
+		Env:        newEnv,
+	}
 }
 
 func (fn *Function) Inspect() string {

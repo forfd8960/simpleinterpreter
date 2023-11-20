@@ -18,6 +18,7 @@ var (
 	ErrIdentifierNotFound            = "identifier: %s is not found"
 	ErrIdentifierIsNotCallable       = "%s is not callable(it shoud be function or xxx)"
 	ErrOnlyClassInstanceHaveProperty = "expr: %s can not get property, only class instance have property"
+	ErrThisNotFoundClassInstance     = "this can not found the class instance"
 )
 
 func Eval(node ast.Node, env *object.Environment) (object.Object, error) {
@@ -56,6 +57,8 @@ func Eval(node ast.Node, env *object.Environment) (object.Object, error) {
 		return evalGetStmt(v, env)
 	case *ast.Set: // classObj.property = value
 		return evalSetStmt(v, env)
+	case *ast.ThisExpr:
+		return evalThisExpr(v, env)
 	}
 
 	return nil, nil
@@ -417,6 +420,16 @@ func evalSetStmt(set *ast.Set, env *object.Environment) (object.Object, error) {
 
 	clsInstance.Set(set.Name, value)
 	return value, nil
+}
+
+func evalThisExpr(kw *ast.ThisExpr, env *object.Environment) (object.Object, error) {
+	// this should called in the method body
+	// then can get the class instance from the env
+	expr, ok := env.Get(kw.TokenLiteral())
+	if !ok {
+		return nil, fmt.Errorf(ErrThisNotFoundClassInstance)
+	}
+	return expr, nil
 }
 
 func evalLiteralInteger(value interface{}) (*object.Integer, error) {
