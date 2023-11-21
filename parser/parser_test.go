@@ -70,28 +70,29 @@ func TestWhileStmt(t *testing.T) {
 	p := NewParser(tokenList)
 	if assert.NotNil(t, p) {
 		program, err := p.ParseProgram()
-		assert.Nil(t, err)
-		assert.NotNil(t, program)
+		if assert.Nil(t, err) {
+			assert.NotNil(t, program)
 
-		assert.Equal(t, ast.NewWhileStmt(
-			ast.NewBinary(
-				ast.NewIdentifier(identA),
-				ast.NewIdentifier(identB),
-				tokens.NewToken(tokens.LT, "<", "<"),
-			),
-			ast.NewBlockStmt([]ast.Stmt{
-				ast.NewExpressionStmt(
-					ast.NewAssign(
-						identA,
-						ast.NewBinary(
-							ast.NewIdentifier(identA),
-							ast.NewLiteral(oneLiteral),
-							tokens.NewToken(tokens.PLUS, "+", "+"),
+			assert.Equal(t, ast.NewWhileStmt(
+				ast.NewBinary(
+					ast.NewIdentifier(identA),
+					ast.NewIdentifier(identB),
+					tokens.NewToken(tokens.LT, "<", "<"),
+				),
+				ast.NewBlockStmt([]ast.Stmt{
+					ast.NewExpressionStmt(
+						ast.NewAssign(
+							identA,
+							ast.NewBinary(
+								ast.NewIdentifier(identA),
+								ast.NewLiteral(oneLiteral),
+								tokens.NewToken(tokens.PLUS, "+", "+"),
+							),
 						),
 					),
-				),
-			}),
-		), program.Stmts[0])
+				}),
+			), program.Stmts[0])
+		}
 	}
 }
 

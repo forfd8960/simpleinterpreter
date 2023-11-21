@@ -2,6 +2,7 @@ package parser
 
 import (
 	"fmt"
+	"reflect"
 
 	"github.com/forfd8960/simpleinterpreter/ast"
 	"github.com/forfd8960/simpleinterpreter/tokens"
@@ -391,7 +392,12 @@ func (p *Parser) assignment() (ast.Expression, error) {
 			return nil, err
 		}
 
+		fmt.Printf("value type: %v\n", reflect.TypeOf(value))
+		fmt.Printf("exp type: %v\n", reflect.TypeOf(exp))
+
 		switch v := exp.(type) {
+		case *ast.Identifier:
+			return ast.NewAssign(v.Token, value), nil
 		case *ast.Assign:
 			return ast.NewAssign(v.Name, value), nil
 		case *ast.Get:

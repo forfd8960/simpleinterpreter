@@ -12,6 +12,10 @@ const (
 	KWThis   = "this"
 )
 
+var (
+	Assign = NewToken(ASSIGN, "=", "=")
+)
+
 var keywords = map[string]TokenType{
 	"let":    LET,
 	KWClass:  CLASS,
