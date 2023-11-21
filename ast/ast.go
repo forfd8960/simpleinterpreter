@@ -112,10 +112,10 @@ func NewThisExpr(kw *tokens.Token) *ThisExpr {
 	}
 }
 
-func (this *ThisExpr) StmtNode() {}
-func (this *ThisExpr) ExprNode() {}
-func (this *ThisExpr) TokenLiteral() string {
-	return this.keyword.Literal
+func (te *ThisExpr) StmtNode() {}
+func (te *ThisExpr) ExprNode() {}
+func (te *ThisExpr) TokenLiteral() string {
+	return te.keyword.Literal
 }
 
 type Assign struct {

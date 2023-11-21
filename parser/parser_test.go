@@ -96,6 +96,38 @@ func TestWhileStmt(t *testing.T) {
 	}
 }
 
+func TestAssign(t *testing.T) {
+	input := `
+	let a = 1;
+	a = a + 10;
+	`
+	tokenList, err := lexer.TokensFromInput(input)
+	assert.Nil(t, err)
+
+	p := NewParser(tokenList)
+	if assert.NotNil(t, p) {
+		program, err := p.ParseProgram()
+		if assert.Nil(t, err) {
+			assert.NotNil(t, program)
+
+			assert.Equal(t, []ast.Stmt{
+				ast.NewLetStmt(
+					tokens.NewToken(tokens.IDENT, "a", "a"),
+					ast.NewLiteral(tokens.NewToken(tokens.INTEGER, "1", int64(1))),
+				),
+				ast.NewExpressionStmt(ast.NewAssign(
+					tokens.NewToken(tokens.IDENT, "a", "a"),
+					ast.NewBinary(
+						ast.NewIdentifier1("a"),
+						ast.NewLiteral(tokens.NewToken(tokens.INTEGER, "10", int64(10))),
+						tokens.NewToken(tokens.PLUS, "+", "+"),
+					),
+				)),
+			}, program.Stmts)
+		}
+	}
+}
+
 func TestIFStmt(t *testing.T) {
 	input := `if (1 <= 2) {
 		print("%d", 1);

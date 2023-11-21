@@ -33,6 +33,8 @@ func Eval(node ast.Node, env *object.Environment) (object.Object, error) {
 		return evalBockStmts(v, env)
 	case *ast.LetStmt:
 		return evalLetStmt(v, env)
+	case *ast.Assign:
+		return evalAssign(v, env)
 	case *ast.Identifier:
 		return evalIdent(v, env)
 	case *ast.IFStmt:
@@ -149,6 +151,18 @@ func evalLetStmt(let *ast.LetStmt, env *object.Environment) (object.Object, erro
 	}
 
 	env.Set(let.Ident.Name, obj)
+	return obj, nil
+}
+
+func evalAssign(assign *ast.Assign, env *object.Environment) (object.Object, error) {
+	fmt.Printf("eval assign: %+v\n", assign)
+
+	obj, err := Eval(assign.Value, env)
+	if err != nil {
+		return nil, err
+	}
+
+	env.Set(assign.Name.Literal, obj)
 	return obj, nil
 }
 
