@@ -6,10 +6,19 @@ import (
 )
 
 const (
+	KWLet    = "let"
 	KWReturn = "return"
 	KWPrint  = "print"
 	KWClass  = "class"
 	KWThis   = "this"
+	KWFn     = "fn"
+	KWIf     = "if"
+	KWElse   = "else"
+	KwFor    = "for"
+	KwWhile  = "while"
+	KWTrue   = "true"
+	KWFlase  = "false"
+	KWNull   = "null"
 )
 
 var (
@@ -17,21 +26,22 @@ var (
 )
 
 var keywords = map[string]TokenType{
-	"let":    LET,
+	KWLet:    LET,
 	KWClass:  CLASS,
 	KWThis:   THIS,
-	"fn":     FUNCTION,
-	"if":     IF,
-	"else":   ELSE,
+	KWFn:     FUNCTION,
+	KWIf:     IF,
+	KWElse:   ELSE,
+	KwFor:    FOR,
 	KWReturn: RETURN,
-	"true":   TRUE,
-	"false":  FALSE,
+	KWTrue:   TRUE,
+	KWFlase:  FALSE,
 	KWPrint:  PRINT,
-	"null":   NIL,
+	KWNull:   NIL,
 }
 
 var keyword2Token = map[string]*Token{
-	"let": {
+	KWLet: {
 		TkType:  LET,
 		Literal: "let",
 		Value:   "let",
@@ -46,27 +56,27 @@ var keyword2Token = map[string]*Token{
 		Literal: "this",
 		Value:   "this",
 	},
-	"fn": {
+	KWFn: {
 		TkType:  FUNCTION,
-		Literal: "fn",
+		Literal: KWFn,
 		Value:   "function",
 	},
-	"if": {
+	KWIf: {
 		TkType:  IF,
 		Literal: "if",
 		Value:   "if",
 	},
-	"for": {
+	KwFor: {
 		TkType:  FOR,
 		Literal: "for",
 		Value:   "for",
 	},
-	"while": {
+	KwWhile: {
 		TkType:  WHILE,
 		Literal: "while",
 		Value:   "while",
 	},
-	"else": {
+	KWElse: {
 		TkType:  ELSE,
 		Literal: "else",
 		Value:   "else",
@@ -81,17 +91,17 @@ var keyword2Token = map[string]*Token{
 		Literal: "print",
 		Value:   "print",
 	},
-	"true": {
+	KWTrue: {
 		TkType:  TRUE,
 		Literal: "true",
 		Value:   true,
 	},
-	"false": {
+	KWFlase: {
 		TkType:  FALSE,
 		Literal: "false",
 		Value:   false,
 	},
-	"null": {
+	KWNull: {
 		TkType:  NIL,
 		Literal: "null",
 		Value:   nil,
