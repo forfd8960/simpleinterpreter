@@ -19,6 +19,7 @@ var (
 	ErrIdentifierIsNotCallable       = "%s is not callable(it shoud be function or xxx)"
 	ErrOnlyClassInstanceHaveProperty = "expr: %s can not get property, only class instance have property"
 	ErrThisNotFoundClassInstance     = "this can not found the class instance"
+	ErrCondMustBeBoolValue           = "condition must be a bool value: %v"
 )
 
 func Eval(node ast.Node, env *object.Environment) (object.Object, error) {
@@ -31,6 +32,8 @@ func Eval(node ast.Node, env *object.Environment) (object.Object, error) {
 		return evalFunctionStmt(v, env)
 	case *ast.Block:
 		return evalBockStmts(v, env)
+	case *ast.WhileStmt:
+		return evalWhileStmt(v, env)
 	case *ast.LetStmt:
 		return evalLetStmt(v, env)
 	case *ast.Assign:
@@ -125,13 +128,11 @@ func newError(format string, args ...interface{}) *object.Error {
 	}
 }
 
-func evalBockStmts(b *ast.Block, global *object.Environment) (object.Object, error) {
-	newStmtEnv := object.NewEnvWithOutter(global)
-
+func evalBockStmts(b *ast.Block, env *object.Environment) (object.Object, error) {
 	var obj object.Object
 	var err error
 	for _, stmt := range b.Statements {
-		obj, err = Eval(stmt, newStmtEnv)
+		obj, err = Eval(stmt, env)
 		if err != nil {
 			return nil, err
 		}
@@ -142,6 +143,37 @@ func evalBockStmts(b *ast.Block, global *object.Environment) (object.Object, err
 	}
 
 	return obj, nil
+}
+
+func evalWhileStmt(wl *ast.WhileStmt, env *object.Environment) (object.Object, error) {
+	var result object.Object
+	for {
+		cond, err := Eval(wl.Condition, env)
+		if err != nil {
+			return nil, err
+		}
+
+		truth, ok := cond.(*object.Bool)
+		if !ok {
+			return nil, fmt.Errorf(ErrCondMustBeBoolValue, cond)
+		}
+
+		if !truth.Value {
+			break
+		}
+
+		result, err = Eval(wl.Body, env)
+		if err != nil {
+			return nil, err
+		}
+
+		ret, isRet := result.(*object.Return)
+		if isRet {
+			return ret, nil
+		}
+	}
+
+	return result, nil
 }
 
 func evalLetStmt(let *ast.LetStmt, env *object.Environment) (object.Object, error) {

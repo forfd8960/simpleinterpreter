@@ -2,7 +2,6 @@ package parser
 
 import (
 	"fmt"
-	"reflect"
 
 	"github.com/forfd8960/simpleinterpreter/ast"
 	"github.com/forfd8960/simpleinterpreter/tokens"
@@ -206,7 +205,9 @@ func (p *Parser) statement() (ast.Stmt, error) {
 }
 
 func (p *Parser) forStatement() (ast.Stmt, error) {
-	p.consume(tokens.LPRARENT, "Expect `(` after for.")
+	if _, err := p.consume(tokens.LPRARENT, "Expect `(` after for."); err != nil {
+		return nil, err
+	}
 
 	var initializer ast.Stmt
 	var err error
@@ -326,12 +327,17 @@ func (p *Parser) printStatement() (ast.Stmt, error) {
 
 // whileStatement
 func (p *Parser) whileStatement() (ast.Stmt, error) {
-	p.consume(tokens.LPRARENT, `expect "(" after 'while'.`)
+	if _, err := p.consume(tokens.LPRARENT, `expect "(" after 'while'.`); err != nil {
+		return nil, err
+	}
+
 	cond, err := p.parseExpr()
 	if err != nil {
 		return nil, err
 	}
-	p.consume(tokens.RPARENT, `expect ")" after condition.`)
+	if _, err := p.consume(tokens.RPARENT, `expect ")" after condition.`); err != nil {
+		return nil, err
+	}
 
 	body, err := p.statement()
 	if err != nil {
@@ -391,9 +397,6 @@ func (p *Parser) assignment() (ast.Expression, error) {
 		if err != nil {
 			return nil, err
 		}
-
-		fmt.Printf("value type: %v\n", reflect.TypeOf(value))
-		fmt.Printf("exp type: %v\n", reflect.TypeOf(exp))
 
 		switch v := exp.(type) {
 		case *ast.Identifier:
