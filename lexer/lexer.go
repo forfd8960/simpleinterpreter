@@ -80,11 +80,11 @@ func (l *Lexer) scanToken() (*tokens.Token, error) {
 	case ',':
 		tok = l.buildToken(tokens.COMMA, ",")
 	case '+':
-		tok = l.buildToken(tokens.PLUS, "+")
+		tok = CondExp(l.match('+'), l.buildToken(tokens.DPlus, "++"), l.buildToken(tokens.PLUS, "+"))
 	case '-':
-		tok = l.buildToken(tokens.MINUS, "-")
+		tok = CondExp(l.match('-'), l.buildToken(tokens.DMinus, "--"), l.buildToken(tokens.MINUS, "-"))
 	case '*':
-		tok = l.buildToken(tokens.ASTERISK, "*")
+		tok = CondExp(l.match('*'), l.buildToken(tokens.POW, "**"), l.buildToken(tokens.ASTERISK, "*"))
 	case '/':
 		tok = l.buildToken(tokens.SLASH, "/")
 	case '!':

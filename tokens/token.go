@@ -23,6 +23,8 @@ const (
 
 var (
 	Assign = NewToken(ASSIGN, "=", "=")
+	Plus   = NewToken(PLUS, "+", "+")
+	Minus  = NewToken(MINUS, "+", "+")
 )
 
 var keywords = map[string]TokenType{

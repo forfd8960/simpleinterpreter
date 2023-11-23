@@ -21,20 +21,6 @@ func NewParser(tokens []*tokens.Token) *Parser {
 	return p
 }
 
-/*
-expression     → equality ;
-equality       → comparison ( ( "!=" | "==" ) comparison )* ;
-comparison     → term ( ( ">" | ">=" | "<" | "<=" ) term )* ;
-term           → factor ( ( "-" | "+" ) factor )* ;
-factor         → unary ( ( "/" | "*" ) unary )* ;
-unary          → ( "!" | "-" ) unary
-
-	| primary ;
-
-primary        → NUMBER | STRING | "true" | "false" | "nil"
-
-	| "(" expression ")" ;
-*/
 func (p *Parser) ParseProgram() (*ast.Program, error) {
 	program := &ast.Program{
 		Stmts: make([]ast.Stmt, 0, 1),
@@ -545,20 +531,25 @@ func (p *Parser) call() (ast.Expression, error) {
 		return nil, err
 	}
 
-	for {
-		if p.match(tokens.LPRARENT) {
-			expr, err = p.finishCall(expr)
-			if err != nil {
-				return nil, err
+	switch {
+	case p.match(tokens.DPlus, tokens.DMinus):
+		expr = ast.NewDExp(expr, p.previous())
+	default:
+		for {
+			if p.match(tokens.LPRARENT) {
+				expr, err = p.finishCall(expr)
+				if err != nil {
+					return nil, err
+				}
+			} else if p.match(tokens.DOT) {
+				name, err := p.consume(tokens.IDENT, "Expect property name after .")
+				if err != nil {
+					return nil, err
+				}
+				expr = ast.NewGet(expr, name)
+			} else {
+				break
 			}
-		} else if p.match(tokens.DOT) {
-			name, err := p.consume(tokens.IDENT, "Expect property name after .")
-			if err != nil {
-				return nil, err
-			}
-			expr = ast.NewGet(expr, name)
-		} else {
-			break
 		}
 	}
 

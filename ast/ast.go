@@ -149,6 +149,21 @@ func (lg *Logical) TokenLiteral() string {
 	return lg.Operator.Literal
 }
 
+// ++ or --
+type DExp struct {
+	Left     Expression
+	Operator *tokens.Token
+}
+
+func NewDExp(left Expression, operator *tokens.Token) *DExp {
+	return &DExp{Left: left, Operator: operator}
+}
+
+func (dp *DExp) ExprNode() {}
+func (dp *DExp) TokenLiteral() string {
+	return dp.Operator.Literal
+}
+
 type Binary struct {
 	Left     Expression
 	Operator *tokens.Token

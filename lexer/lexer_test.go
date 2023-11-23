@@ -261,3 +261,34 @@ func TestLexerString(t *testing.T) {
 		})
 	}
 }
+
+func TestLexerDPlusDMinus(t *testing.T) {
+	input := `
+	a++;
+	b--;
+	`
+	lexer := NewLexer(input)
+
+	tests := []struct {
+		expectType tokens.TokenType
+		literal    string
+	}{
+		{tokens.IDENT, "a"},
+		{tokens.DPlus, "++"},
+		{tokens.SEMICOLON, ";"},
+		{tokens.IDENT, "b"},
+		{tokens.DMinus, "--"},
+		{tokens.SEMICOLON, ";"},
+		{tokens.EOF, tokens.LiteralEOF},
+	}
+
+	for _, tt := range tests {
+		t.Run("test-"+tt.literal, func(t *testing.T) {
+			token, err := lexer.NextToken()
+
+			assert.Nil(t, err)
+			assert.Equal(t, tt.expectType, token.TkType)
+			assert.Equal(t, tt.literal, token.Literal)
+		})
+	}
+}

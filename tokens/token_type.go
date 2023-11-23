@@ -12,9 +12,12 @@ const (
 	STRING
 	ASSIGN   // =
 	PLUS     // +
+	DPlus    // ++
+	DMinus   // --
 	MINUS    // -
 	BANG     // !
 	ASTERISK // *
+	POW      // **
 	SLASH    // /
 	LT       // <
 	LTEQ     // <=

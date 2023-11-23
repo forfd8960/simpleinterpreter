@@ -58,6 +58,8 @@ func Eval(node ast.Node, env *object.Environment) (object.Object, error) {
 		return evalUnary(v, env)
 	case *ast.Call:
 		return evalCall(v, env)
+	case *ast.DExp: // a--, b++
+		return evalDExp(v, env)
 	case *ast.Get: // classObj.property
 		return evalGetStmt(v, env)
 	case *ast.Set: // classObj.property = value
@@ -187,8 +189,6 @@ func evalLetStmt(let *ast.LetStmt, env *object.Environment) (object.Object, erro
 }
 
 func evalAssign(assign *ast.Assign, env *object.Environment) (object.Object, error) {
-	fmt.Printf("eval assign: %+v\n", assign)
-
 	obj, err := Eval(assign.Value, env)
 	if err != nil {
 		return nil, err
@@ -388,6 +388,35 @@ func evalCall(callExpr *ast.Call, globalEnv *object.Environment) (object.Object,
 	}
 
 	return nil, fmt.Errorf(ErrIdentifierIsNotCallable, callee.Inspect())
+}
+
+func evalDExp(dexp *ast.DExp, env *object.Environment) (object.Object, error) {
+	switch dexp.Operator.TkType {
+	case tokens.DPlus:
+		return evalBinary(
+			ast.NewBinary(
+				dexp.Left,
+				ast.NewLiteral(
+					tokens.NewToken(tokens.INTEGER, "1", int64(1)),
+				),
+				tokens.Plus,
+			),
+			env,
+		)
+	case tokens.DMinus:
+		return evalBinary(
+			ast.NewBinary(
+				dexp.Left,
+				ast.NewLiteral(
+					tokens.NewToken(tokens.INTEGER, "1", int64(1)),
+				),
+				tokens.Minus,
+			),
+			env,
+		)
+	}
+
+	return nil, fmt.Errorf("unsupported operator: %+v", dexp.Operator)
 }
 
 func evalCallClass(cls *object.Class, callExpr *ast.Call, globalEnv *object.Environment) (object.Object, error) {

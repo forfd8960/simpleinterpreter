@@ -7,11 +7,11 @@ import (
 	"strings"
 )
 
-const _TokenTypeName = "ILLEGALEOFIDENTINTEGERSTRINGASSIGNPLUSMINUSBANGASTERISKSLASHLTLTEQGTGTEQEQUALNOTEQUALORANDCOMMASEMICOLONDOTLPRARENTRPARENTLBRACERBRACECLASSTHISFUNCTIONLETIFELSERETURNTRUEFALSENILFORWHILEPRINT"
+const _TokenTypeName = "ILLEGALEOFIDENTINTEGERSTRINGASSIGNPLUSDPlusDMinusMINUSBANGASTERISKPOWSLASHLTLTEQGTGTEQEQUALNOTEQUALORANDCOMMASEMICOLONDOTLPRARENTRPARENTLBRACERBRACECLASSTHISFUNCTIONLETIFELSERETURNTRUEFALSENILFORWHILEPRINT"
 
-var _TokenTypeIndex = [...]uint8{0, 7, 10, 15, 22, 28, 34, 38, 43, 47, 55, 60, 62, 66, 68, 72, 77, 85, 87, 90, 95, 104, 107, 115, 122, 128, 134, 139, 143, 151, 154, 156, 160, 166, 170, 175, 178, 181, 186, 191}
+var _TokenTypeIndex = [...]uint8{0, 7, 10, 15, 22, 28, 34, 38, 43, 49, 54, 58, 66, 69, 74, 76, 80, 82, 86, 91, 99, 101, 104, 109, 118, 121, 129, 136, 142, 148, 153, 157, 165, 168, 170, 174, 180, 184, 189, 192, 195, 200, 205}
 
-const _TokenTypeLowerName = "illegaleofidentintegerstringassignplusminusbangasteriskslashltlteqgtgteqequalnotequalorandcommasemicolondotlprarentrparentlbracerbraceclassthisfunctionletifelsereturntruefalsenilforwhileprint"
+const _TokenTypeLowerName = "illegaleofidentintegerstringassignplusdplusdminusminusbangasteriskpowslashltlteqgtgteqequalnotequalorandcommasemicolondotlprarentrparentlbracerbraceclassthisfunctionletifelsereturntruefalsenilforwhileprint"
 
 func (i TokenType) String() string {
 	if i < 0 || i >= TokenType(len(_TokenTypeIndex)-1) {
@@ -31,41 +31,44 @@ func _TokenTypeNoOp() {
 	_ = x[STRING-(4)]
 	_ = x[ASSIGN-(5)]
 	_ = x[PLUS-(6)]
-	_ = x[MINUS-(7)]
-	_ = x[BANG-(8)]
-	_ = x[ASTERISK-(9)]
-	_ = x[SLASH-(10)]
-	_ = x[LT-(11)]
-	_ = x[LTEQ-(12)]
-	_ = x[GT-(13)]
-	_ = x[GTEQ-(14)]
-	_ = x[EQUAL-(15)]
-	_ = x[NOTEQUAL-(16)]
-	_ = x[OR-(17)]
-	_ = x[AND-(18)]
-	_ = x[COMMA-(19)]
-	_ = x[SEMICOLON-(20)]
-	_ = x[DOT-(21)]
-	_ = x[LPRARENT-(22)]
-	_ = x[RPARENT-(23)]
-	_ = x[LBRACE-(24)]
-	_ = x[RBRACE-(25)]
-	_ = x[CLASS-(26)]
-	_ = x[THIS-(27)]
-	_ = x[FUNCTION-(28)]
-	_ = x[LET-(29)]
-	_ = x[IF-(30)]
-	_ = x[ELSE-(31)]
-	_ = x[RETURN-(32)]
-	_ = x[TRUE-(33)]
-	_ = x[FALSE-(34)]
-	_ = x[NIL-(35)]
-	_ = x[FOR-(36)]
-	_ = x[WHILE-(37)]
-	_ = x[PRINT-(38)]
+	_ = x[DPlus-(7)]
+	_ = x[DMinus-(8)]
+	_ = x[MINUS-(9)]
+	_ = x[BANG-(10)]
+	_ = x[ASTERISK-(11)]
+	_ = x[POW-(12)]
+	_ = x[SLASH-(13)]
+	_ = x[LT-(14)]
+	_ = x[LTEQ-(15)]
+	_ = x[GT-(16)]
+	_ = x[GTEQ-(17)]
+	_ = x[EQUAL-(18)]
+	_ = x[NOTEQUAL-(19)]
+	_ = x[OR-(20)]
+	_ = x[AND-(21)]
+	_ = x[COMMA-(22)]
+	_ = x[SEMICOLON-(23)]
+	_ = x[DOT-(24)]
+	_ = x[LPRARENT-(25)]
+	_ = x[RPARENT-(26)]
+	_ = x[LBRACE-(27)]
+	_ = x[RBRACE-(28)]
+	_ = x[CLASS-(29)]
+	_ = x[THIS-(30)]
+	_ = x[FUNCTION-(31)]
+	_ = x[LET-(32)]
+	_ = x[IF-(33)]
+	_ = x[ELSE-(34)]
+	_ = x[RETURN-(35)]
+	_ = x[TRUE-(36)]
+	_ = x[FALSE-(37)]
+	_ = x[NIL-(38)]
+	_ = x[FOR-(39)]
+	_ = x[WHILE-(40)]
+	_ = x[PRINT-(41)]
 }
 
-var _TokenTypeValues = []TokenType{ILLEGAL, EOF, IDENT, INTEGER, STRING, ASSIGN, PLUS, MINUS, BANG, ASTERISK, SLASH, LT, LTEQ, GT, GTEQ, EQUAL, NOTEQUAL, OR, AND, COMMA, SEMICOLON, DOT, LPRARENT, RPARENT, LBRACE, RBRACE, CLASS, THIS, FUNCTION, LET, IF, ELSE, RETURN, TRUE, FALSE, NIL, FOR, WHILE, PRINT}
+var _TokenTypeValues = []TokenType{ILLEGAL, EOF, IDENT, INTEGER, STRING, ASSIGN, PLUS, DPlus, DMinus, MINUS, BANG, ASTERISK, POW, SLASH, LT, LTEQ, GT, GTEQ, EQUAL, NOTEQUAL, OR, AND, COMMA, SEMICOLON, DOT, LPRARENT, RPARENT, LBRACE, RBRACE, CLASS, THIS, FUNCTION, LET, IF, ELSE, RETURN, TRUE, FALSE, NIL, FOR, WHILE, PRINT}
 
 var _TokenTypeNameToValueMap = map[string]TokenType{
 	_TokenTypeName[0:7]:          ILLEGAL,
@@ -82,70 +85,76 @@ var _TokenTypeNameToValueMap = map[string]TokenType{
 	_TokenTypeLowerName[28:34]:   ASSIGN,
 	_TokenTypeName[34:38]:        PLUS,
 	_TokenTypeLowerName[34:38]:   PLUS,
-	_TokenTypeName[38:43]:        MINUS,
-	_TokenTypeLowerName[38:43]:   MINUS,
-	_TokenTypeName[43:47]:        BANG,
-	_TokenTypeLowerName[43:47]:   BANG,
-	_TokenTypeName[47:55]:        ASTERISK,
-	_TokenTypeLowerName[47:55]:   ASTERISK,
-	_TokenTypeName[55:60]:        SLASH,
-	_TokenTypeLowerName[55:60]:   SLASH,
-	_TokenTypeName[60:62]:        LT,
-	_TokenTypeLowerName[60:62]:   LT,
-	_TokenTypeName[62:66]:        LTEQ,
-	_TokenTypeLowerName[62:66]:   LTEQ,
-	_TokenTypeName[66:68]:        GT,
-	_TokenTypeLowerName[66:68]:   GT,
-	_TokenTypeName[68:72]:        GTEQ,
-	_TokenTypeLowerName[68:72]:   GTEQ,
-	_TokenTypeName[72:77]:        EQUAL,
-	_TokenTypeLowerName[72:77]:   EQUAL,
-	_TokenTypeName[77:85]:        NOTEQUAL,
-	_TokenTypeLowerName[77:85]:   NOTEQUAL,
-	_TokenTypeName[85:87]:        OR,
-	_TokenTypeLowerName[85:87]:   OR,
-	_TokenTypeName[87:90]:        AND,
-	_TokenTypeLowerName[87:90]:   AND,
-	_TokenTypeName[90:95]:        COMMA,
-	_TokenTypeLowerName[90:95]:   COMMA,
-	_TokenTypeName[95:104]:       SEMICOLON,
-	_TokenTypeLowerName[95:104]:  SEMICOLON,
-	_TokenTypeName[104:107]:      DOT,
-	_TokenTypeLowerName[104:107]: DOT,
-	_TokenTypeName[107:115]:      LPRARENT,
-	_TokenTypeLowerName[107:115]: LPRARENT,
-	_TokenTypeName[115:122]:      RPARENT,
-	_TokenTypeLowerName[115:122]: RPARENT,
-	_TokenTypeName[122:128]:      LBRACE,
-	_TokenTypeLowerName[122:128]: LBRACE,
-	_TokenTypeName[128:134]:      RBRACE,
-	_TokenTypeLowerName[128:134]: RBRACE,
-	_TokenTypeName[134:139]:      CLASS,
-	_TokenTypeLowerName[134:139]: CLASS,
-	_TokenTypeName[139:143]:      THIS,
-	_TokenTypeLowerName[139:143]: THIS,
-	_TokenTypeName[143:151]:      FUNCTION,
-	_TokenTypeLowerName[143:151]: FUNCTION,
-	_TokenTypeName[151:154]:      LET,
-	_TokenTypeLowerName[151:154]: LET,
-	_TokenTypeName[154:156]:      IF,
-	_TokenTypeLowerName[154:156]: IF,
-	_TokenTypeName[156:160]:      ELSE,
-	_TokenTypeLowerName[156:160]: ELSE,
-	_TokenTypeName[160:166]:      RETURN,
-	_TokenTypeLowerName[160:166]: RETURN,
-	_TokenTypeName[166:170]:      TRUE,
-	_TokenTypeLowerName[166:170]: TRUE,
-	_TokenTypeName[170:175]:      FALSE,
-	_TokenTypeLowerName[170:175]: FALSE,
-	_TokenTypeName[175:178]:      NIL,
-	_TokenTypeLowerName[175:178]: NIL,
-	_TokenTypeName[178:181]:      FOR,
-	_TokenTypeLowerName[178:181]: FOR,
-	_TokenTypeName[181:186]:      WHILE,
-	_TokenTypeLowerName[181:186]: WHILE,
-	_TokenTypeName[186:191]:      PRINT,
-	_TokenTypeLowerName[186:191]: PRINT,
+	_TokenTypeName[38:43]:        DPlus,
+	_TokenTypeLowerName[38:43]:   DPlus,
+	_TokenTypeName[43:49]:        DMinus,
+	_TokenTypeLowerName[43:49]:   DMinus,
+	_TokenTypeName[49:54]:        MINUS,
+	_TokenTypeLowerName[49:54]:   MINUS,
+	_TokenTypeName[54:58]:        BANG,
+	_TokenTypeLowerName[54:58]:   BANG,
+	_TokenTypeName[58:66]:        ASTERISK,
+	_TokenTypeLowerName[58:66]:   ASTERISK,
+	_TokenTypeName[66:69]:        POW,
+	_TokenTypeLowerName[66:69]:   POW,
+	_TokenTypeName[69:74]:        SLASH,
+	_TokenTypeLowerName[69:74]:   SLASH,
+	_TokenTypeName[74:76]:        LT,
+	_TokenTypeLowerName[74:76]:   LT,
+	_TokenTypeName[76:80]:        LTEQ,
+	_TokenTypeLowerName[76:80]:   LTEQ,
+	_TokenTypeName[80:82]:        GT,
+	_TokenTypeLowerName[80:82]:   GT,
+	_TokenTypeName[82:86]:        GTEQ,
+	_TokenTypeLowerName[82:86]:   GTEQ,
+	_TokenTypeName[86:91]:        EQUAL,
+	_TokenTypeLowerName[86:91]:   EQUAL,
+	_TokenTypeName[91:99]:        NOTEQUAL,
+	_TokenTypeLowerName[91:99]:   NOTEQUAL,
+	_TokenTypeName[99:101]:       OR,
+	_TokenTypeLowerName[99:101]:  OR,
+	_TokenTypeName[101:104]:      AND,
+	_TokenTypeLowerName[101:104]: AND,
+	_TokenTypeName[104:109]:      COMMA,
+	_TokenTypeLowerName[104:109]: COMMA,
+	_TokenTypeName[109:118]:      SEMICOLON,
+	_TokenTypeLowerName[109:118]: SEMICOLON,
+	_TokenTypeName[118:121]:      DOT,
+	_TokenTypeLowerName[118:121]: DOT,
+	_TokenTypeName[121:129]:      LPRARENT,
+	_TokenTypeLowerName[121:129]: LPRARENT,
+	_TokenTypeName[129:136]:      RPARENT,
+	_TokenTypeLowerName[129:136]: RPARENT,
+	_TokenTypeName[136:142]:      LBRACE,
+	_TokenTypeLowerName[136:142]: LBRACE,
+	_TokenTypeName[142:148]:      RBRACE,
+	_TokenTypeLowerName[142:148]: RBRACE,
+	_TokenTypeName[148:153]:      CLASS,
+	_TokenTypeLowerName[148:153]: CLASS,
+	_TokenTypeName[153:157]:      THIS,
+	_TokenTypeLowerName[153:157]: THIS,
+	_TokenTypeName[157:165]:      FUNCTION,
+	_TokenTypeLowerName[157:165]: FUNCTION,
+	_TokenTypeName[165:168]:      LET,
+	_TokenTypeLowerName[165:168]: LET,
+	_TokenTypeName[168:170]:      IF,
+	_TokenTypeLowerName[168:170]: IF,
+	_TokenTypeName[170:174]:      ELSE,
+	_TokenTypeLowerName[170:174]: ELSE,
+	_TokenTypeName[174:180]:      RETURN,
+	_TokenTypeLowerName[174:180]: RETURN,
+	_TokenTypeName[180:184]:      TRUE,
+	_TokenTypeLowerName[180:184]: TRUE,
+	_TokenTypeName[184:189]:      FALSE,
+	_TokenTypeLowerName[184:189]: FALSE,
+	_TokenTypeName[189:192]:      NIL,
+	_TokenTypeLowerName[189:192]: NIL,
+	_TokenTypeName[192:195]:      FOR,
+	_TokenTypeLowerName[192:195]: FOR,
+	_TokenTypeName[195:200]:      WHILE,
+	_TokenTypeLowerName[195:200]: WHILE,
+	_TokenTypeName[200:205]:      PRINT,
+	_TokenTypeLowerName[200:205]: PRINT,
 }
 
 var _TokenTypeNames = []string{
@@ -157,37 +166,40 @@ var _TokenTypeNames = []string{
 	_TokenTypeName[28:34],
 	_TokenTypeName[34:38],
 	_TokenTypeName[38:43],
-	_TokenTypeName[43:47],
-	_TokenTypeName[47:55],
-	_TokenTypeName[55:60],
-	_TokenTypeName[60:62],
-	_TokenTypeName[62:66],
-	_TokenTypeName[66:68],
-	_TokenTypeName[68:72],
-	_TokenTypeName[72:77],
-	_TokenTypeName[77:85],
-	_TokenTypeName[85:87],
-	_TokenTypeName[87:90],
-	_TokenTypeName[90:95],
-	_TokenTypeName[95:104],
-	_TokenTypeName[104:107],
-	_TokenTypeName[107:115],
-	_TokenTypeName[115:122],
-	_TokenTypeName[122:128],
-	_TokenTypeName[128:134],
-	_TokenTypeName[134:139],
-	_TokenTypeName[139:143],
-	_TokenTypeName[143:151],
-	_TokenTypeName[151:154],
-	_TokenTypeName[154:156],
-	_TokenTypeName[156:160],
-	_TokenTypeName[160:166],
-	_TokenTypeName[166:170],
-	_TokenTypeName[170:175],
-	_TokenTypeName[175:178],
-	_TokenTypeName[178:181],
-	_TokenTypeName[181:186],
-	_TokenTypeName[186:191],
+	_TokenTypeName[43:49],
+	_TokenTypeName[49:54],
+	_TokenTypeName[54:58],
+	_TokenTypeName[58:66],
+	_TokenTypeName[66:69],
+	_TokenTypeName[69:74],
+	_TokenTypeName[74:76],
+	_TokenTypeName[76:80],
+	_TokenTypeName[80:82],
+	_TokenTypeName[82:86],
+	_TokenTypeName[86:91],
+	_TokenTypeName[91:99],
+	_TokenTypeName[99:101],
+	_TokenTypeName[101:104],
+	_TokenTypeName[104:109],
+	_TokenTypeName[109:118],
+	_TokenTypeName[118:121],
+	_TokenTypeName[121:129],
+	_TokenTypeName[129:136],
+	_TokenTypeName[136:142],
+	_TokenTypeName[142:148],
+	_TokenTypeName[148:153],
+	_TokenTypeName[153:157],
+	_TokenTypeName[157:165],
+	_TokenTypeName[165:168],
+	_TokenTypeName[168:170],
+	_TokenTypeName[170:174],
+	_TokenTypeName[174:180],
+	_TokenTypeName[180:184],
+	_TokenTypeName[184:189],
+	_TokenTypeName[189:192],
+	_TokenTypeName[192:195],
+	_TokenTypeName[195:200],
+	_TokenTypeName[200:205],
 }
 
 // TokenTypeString retrieves an enum value from the enum constants string name.
