@@ -2,6 +2,7 @@ package eval
 
 import (
 	"fmt"
+	"math"
 
 	"github.com/forfd8960/simpleinterpreter/ast"
 	"github.com/forfd8960/simpleinterpreter/object"
@@ -338,6 +339,8 @@ func doMath(obj1, obj2 object.Object, op tokens.TokenType) (object.Object, error
 		return &object.Integer{Value: leftValue.Value - rightValue.Value}, nil
 	case tokens.ASTERISK:
 		return &object.Integer{Value: leftValue.Value * rightValue.Value}, nil
+	case tokens.POW:
+		return &object.Integer{Value: int64(math.Pow(float64(leftValue.Value), float64(rightValue.Value)))}, nil
 	case tokens.SLASH:
 		if rightValue.Value == 0 {
 			return nil, fmt.Errorf(ErrDivideByZero)
@@ -399,7 +402,7 @@ func evalDExp(dexp *ast.DExp, env *object.Environment) (object.Object, error) {
 				ast.NewLiteral(
 					tokens.NewToken(tokens.INTEGER, "1", int64(1)),
 				),
-				tokens.Plus,
+				tokens.OPPlus,
 			),
 			env,
 		)
@@ -410,7 +413,7 @@ func evalDExp(dexp *ast.DExp, env *object.Environment) (object.Object, error) {
 				ast.NewLiteral(
 					tokens.NewToken(tokens.INTEGER, "1", int64(1)),
 				),
-				tokens.Minus,
+				tokens.OPMinus,
 			),
 			env,
 		)

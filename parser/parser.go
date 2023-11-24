@@ -494,12 +494,30 @@ func (p *Parser) term() (ast.Expression, error) {
 }
 
 func (p *Parser) factor() (ast.Expression, error) {
-	exp, err := p.unary()
+	exp, err := p.pow()
 	if err != nil {
 		return nil, err
 	}
 
 	for p.match(tokens.SLASH, tokens.ASTERISK) {
+		op := p.previous()
+		right, err := p.pow()
+		if err != nil {
+			return nil, err
+		}
+		exp = ast.NewBinary(exp, right, op)
+	}
+
+	return exp, nil
+}
+
+func (p *Parser) pow() (ast.Expression, error) {
+	exp, err := p.unary()
+	if err != nil {
+		return nil, err
+	}
+
+	for p.match(tokens.POW) {
 		op := p.previous()
 		right, err := p.unary()
 		if err != nil {

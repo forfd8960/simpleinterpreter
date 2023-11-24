@@ -212,7 +212,7 @@ func (l *Lexer) parseString() (*tokens.Token, error) {
 }
 
 func (l *Lexer) parseIdent() *tokens.Token {
-	for isAlpha(l.peek()) {
+	for isAlphaNumberic(l.peek()) {
 		l.advance()
 	}
 
