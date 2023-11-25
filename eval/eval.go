@@ -394,14 +394,14 @@ func evalCall(callExpr *ast.Call, globalEnv *object.Environment) (object.Object,
 }
 
 func evalDExp(dexp *ast.DExp, env *object.Environment) (object.Object, error) {
+	oneLiteral, _ := ast.NewLiteral1(1)
+
 	switch dexp.Operator.TkType {
 	case tokens.DPlus:
 		return evalBinary(
 			ast.NewBinary(
 				dexp.Left,
-				ast.NewLiteral(
-					tokens.NewToken(tokens.INTEGER, "1", int64(1)),
-				),
+				oneLiteral,
 				tokens.OPPlus,
 			),
 			env,
@@ -410,9 +410,7 @@ func evalDExp(dexp *ast.DExp, env *object.Environment) (object.Object, error) {
 		return evalBinary(
 			ast.NewBinary(
 				dexp.Left,
-				ast.NewLiteral(
-					tokens.NewToken(tokens.INTEGER, "1", int64(1)),
-				),
+				oneLiteral,
 				tokens.OPMinus,
 			),
 			env,

@@ -128,6 +128,27 @@ func NewToken(tkType TokenType, literal string, value interface{}) *Token {
 	}
 }
 
+func NewIdentToken(name string) *Token {
+	return NewToken(IDENT, name, name)
+}
+
+func NewIntegerToken(v int64) *Token {
+	return NewToken(INTEGER, fmt.Sprintf("%d", v), v)
+}
+
+func NewBoolToken(v bool) *Token {
+	tkTp := TRUE
+	if !v {
+		tkTp = FALSE
+	}
+
+	return NewToken(tkTp, fmt.Sprintf("%t", v), v)
+}
+
+func NewStringToken(v string) *Token {
+	return NewToken(STRING, v, v)
+}
+
 func (tk *Token) String() string {
 	return strings.Join([]string{
 		"TkType: " + tk.TkType.String(),

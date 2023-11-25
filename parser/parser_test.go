@@ -63,6 +63,10 @@ func TestParsePow(t *testing.T) {
 	tokenList, err := lexer.TokensFromInput(input)
 	assert.Nil(t, err)
 
+	oneLiteral, _ := ast.NewLiteral1(1)
+	twoLiteral, _ := ast.NewLiteral1(2)
+	fiveLiteral, _ := ast.NewLiteral1(5)
+
 	p := NewParser(tokenList)
 	if assert.NotNil(t, p) {
 		program, err := p.ParseProgram()
@@ -71,14 +75,11 @@ func TestParsePow(t *testing.T) {
 		if assert.Equal(t, 1, len(program.Stmts)) {
 			assert.Equal(t,
 				ast.NewLetStmt(
-					tokens.NewToken(tokens.IDENT, "v", "v"),
-					ast.NewBinary(
-						ast.NewLiteral(tokens.NewToken(tokens.INTEGER, "1", int64(1))),
-						ast.NewBinary(
-							ast.NewLiteral(tokens.NewToken(tokens.INTEGER, "2", int64(2))),
-							ast.NewLiteral(tokens.NewToken(tokens.INTEGER, "5", int64(5))),
-							tokens.OPPow,
-						),
+					tokens.NewIdentToken("v"),
+					ast.NewBinary(oneLiteral, ast.NewBinary(
+						twoLiteral,
+						fiveLiteral,
+						tokens.OPPow),
 						tokens.OPPlus,
 					),
 				),

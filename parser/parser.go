@@ -241,8 +241,9 @@ func (p *Parser) forStatement() (ast.Stmt, error) {
 	}
 
 	if cond == nil {
-		cond = ast.NewLiteral(tokens.NewToken(tokens.TRUE, "true", true))
+		cond, _ = ast.NewLiteral1(true)
 	}
+
 	body = ast.NewWhileStmt(cond, body)
 
 	if initializer != nil {
