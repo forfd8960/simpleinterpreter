@@ -89,6 +89,57 @@ func TestParsePow(t *testing.T) {
 	}
 }
 
+func TestParseFor(t *testing.T) {
+	input := `for (i = 0; i <= 10; i=i+1) {
+		print("%d", i);
+	}`
+
+	tokenList, err := lexer.TokensFromInput(input)
+	assert.Nil(t, err)
+
+	zeroLiteral, _ := ast.NewLiteral1(0)
+	tenLiteral, _ := ast.NewLiteral1(10)
+	oneLiteral, _ := ast.NewLiteral1(1)
+	fmtLiteral, _ := ast.NewLiteral1("%d")
+
+	p := NewParser(tokenList)
+	if assert.NotNil(t, p) {
+		program, err := p.ParseProgram()
+		if assert.Nil(t, err) {
+			assert.NotNil(t, program)
+
+			assert.Equal(t,
+				ast.NewBlockStmt([]ast.Stmt{
+					ast.NewExpressionStmt(
+						ast.NewAssign(tokens.NewIdentToken("i"), zeroLiteral),
+					),
+					ast.NewWhileStmt(
+						ast.NewBinary(
+							ast.NewIdentifier1("i"),
+							tenLiteral,
+							tokens.NewToken(tokens.LTEQ, "<=", "<="),
+						),
+						ast.NewBlockStmt([]ast.Stmt{
+							ast.NewPrintStmt([]ast.Expression{
+								fmtLiteral,
+								ast.NewIdentifier1("i"),
+							}),
+							ast.NewExpressionStmt(
+								ast.NewAssign(tokens.NewIdentToken("i"), ast.NewBinary(
+									ast.NewIdentifier1("i"),
+									oneLiteral,
+									tokens.OPPlus,
+								)),
+							),
+						}),
+					),
+				}),
+				program.Stmts[0],
+			)
+		}
+	}
+}
+
 func TestWhileStmt(t *testing.T) {
 	input := `while ( a < b) {
 		a = a + 1;
