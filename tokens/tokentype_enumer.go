@@ -7,11 +7,11 @@ import (
 	"strings"
 )
 
-const _TokenTypeName = "ILLEGALEOFIDENTINTEGERSTRINGASSIGNPLUSDPlusDMinusMINUSBANGASTERISKPOWSLASHLTLTEQGTGTEQEQUALNOTEQUALORANDCOMMASEMICOLONDOTLPRARENTRPARENTLBRACERBRACECLASSTHISFUNCTIONLETIFELSERETURNTRUEFALSENILFORWHILEPRINT"
+const _TokenTypeName = "ILLEGALEOFIDENTINTEGERSTRINGASSIGNPLUSDPlusDMinusMINUSBANGASTERISKPOWSLASHLTLTEQGTGTEQEQUALNOTEQUALORANDCOMMASEMICOLONDOTLPRARENTRPARENTLBRACERBRACECLASSTHISFUNCTIONLETIFELSERETURNTRUEFALSENILFORWHILEPRINTBREAK"
 
-var _TokenTypeIndex = [...]uint8{0, 7, 10, 15, 22, 28, 34, 38, 43, 49, 54, 58, 66, 69, 74, 76, 80, 82, 86, 91, 99, 101, 104, 109, 118, 121, 129, 136, 142, 148, 153, 157, 165, 168, 170, 174, 180, 184, 189, 192, 195, 200, 205}
+var _TokenTypeIndex = [...]uint8{0, 7, 10, 15, 22, 28, 34, 38, 43, 49, 54, 58, 66, 69, 74, 76, 80, 82, 86, 91, 99, 101, 104, 109, 118, 121, 129, 136, 142, 148, 153, 157, 165, 168, 170, 174, 180, 184, 189, 192, 195, 200, 205, 210}
 
-const _TokenTypeLowerName = "illegaleofidentintegerstringassignplusdplusdminusminusbangasteriskpowslashltlteqgtgteqequalnotequalorandcommasemicolondotlprarentrparentlbracerbraceclassthisfunctionletifelsereturntruefalsenilforwhileprint"
+const _TokenTypeLowerName = "illegaleofidentintegerstringassignplusdplusdminusminusbangasteriskpowslashltlteqgtgteqequalnotequalorandcommasemicolondotlprarentrparentlbracerbraceclassthisfunctionletifelsereturntruefalsenilforwhileprintbreak"
 
 func (i TokenType) String() string {
 	if i < 0 || i >= TokenType(len(_TokenTypeIndex)-1) {
@@ -66,9 +66,10 @@ func _TokenTypeNoOp() {
 	_ = x[FOR-(39)]
 	_ = x[WHILE-(40)]
 	_ = x[PRINT-(41)]
+	_ = x[BREAK-(42)]
 }
 
-var _TokenTypeValues = []TokenType{ILLEGAL, EOF, IDENT, INTEGER, STRING, ASSIGN, PLUS, DPlus, DMinus, MINUS, BANG, ASTERISK, POW, SLASH, LT, LTEQ, GT, GTEQ, EQUAL, NOTEQUAL, OR, AND, COMMA, SEMICOLON, DOT, LPRARENT, RPARENT, LBRACE, RBRACE, CLASS, THIS, FUNCTION, LET, IF, ELSE, RETURN, TRUE, FALSE, NIL, FOR, WHILE, PRINT}
+var _TokenTypeValues = []TokenType{ILLEGAL, EOF, IDENT, INTEGER, STRING, ASSIGN, PLUS, DPlus, DMinus, MINUS, BANG, ASTERISK, POW, SLASH, LT, LTEQ, GT, GTEQ, EQUAL, NOTEQUAL, OR, AND, COMMA, SEMICOLON, DOT, LPRARENT, RPARENT, LBRACE, RBRACE, CLASS, THIS, FUNCTION, LET, IF, ELSE, RETURN, TRUE, FALSE, NIL, FOR, WHILE, PRINT, BREAK}
 
 var _TokenTypeNameToValueMap = map[string]TokenType{
 	_TokenTypeName[0:7]:          ILLEGAL,
@@ -155,6 +156,8 @@ var _TokenTypeNameToValueMap = map[string]TokenType{
 	_TokenTypeLowerName[195:200]: WHILE,
 	_TokenTypeName[200:205]:      PRINT,
 	_TokenTypeLowerName[200:205]: PRINT,
+	_TokenTypeName[205:210]:      BREAK,
+	_TokenTypeLowerName[205:210]: BREAK,
 }
 
 var _TokenTypeNames = []string{
@@ -200,6 +203,7 @@ var _TokenTypeNames = []string{
 	_TokenTypeName[192:195],
 	_TokenTypeName[195:200],
 	_TokenTypeName[200:205],
+	_TokenTypeName[205:210],
 }
 
 // TokenTypeString retrieves an enum value from the enum constants string name.

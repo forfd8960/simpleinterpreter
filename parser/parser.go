@@ -177,6 +177,8 @@ func (p *Parser) statement() (ast.Stmt, error) {
 		return p.parseReturnStmt()
 	case p.match(tokens.PRINT):
 		return p.printStatement()
+	case p.match(tokens.BREAK):
+		return p.parseBreakStmt()
 	case p.match(tokens.WHILE):
 		return p.whileStatement()
 	case p.match(tokens.LBRACE):
@@ -310,6 +312,14 @@ func (p *Parser) printStatement() (ast.Stmt, error) {
 		return nil, err
 	}
 	return ast.NewPrintStmt(values), nil
+}
+
+func (p *Parser) parseBreakStmt() (ast.Stmt, error) {
+	if _, err := p.consume(tokens.SEMICOLON, `Expect ";" after break`); err != nil {
+		return nil, err
+	}
+
+	return ast.NewBreakStmt(), nil
 }
 
 // whileStatement

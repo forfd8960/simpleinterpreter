@@ -16,6 +16,7 @@ const (
 	KWElse   = "else"
 	KwFor    = "for"
 	KwWhile  = "while"
+	KwBreak  = "break"
 	KWTrue   = "true"
 	KWFlase  = "false"
 	KWNull   = "null"
@@ -81,6 +82,11 @@ var keyword2Token = map[string]*Token{
 		TkType:  WHILE,
 		Literal: "while",
 		Value:   "while",
+	},
+	KwBreak: {
+		TkType:  BREAK,
+		Literal: "break",
+		Value:   "break",
 	},
 	KWElse: {
 		TkType:  ELSE,

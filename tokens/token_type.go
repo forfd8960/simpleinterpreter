@@ -53,6 +53,7 @@ const (
 	FOR   // for
 	WHILE // while
 	PRINT // print()
+	BREAK // break
 )
 
 const (

@@ -427,3 +427,45 @@ func TestParseCallExpression(t *testing.T) {
 		})
 	}
 }
+
+func TestParseBreakStmt(t *testing.T) {
+	input := `while ( a < b) {
+		a = a + 1;
+		break;
+	}`
+	tokenList, err := lexer.TokensFromInput(input)
+	assert.Nil(t, err)
+
+	identA := tokens.NewToken(tokens.IDENT, "a", "a")
+	identB := tokens.NewToken(tokens.IDENT, "b", "b")
+	oneLiteral := tokens.NewToken(tokens.INTEGER, "1", int64(1))
+
+	p := NewParser(tokenList)
+	if assert.NotNil(t, p) {
+		program, err := p.ParseProgram()
+		if assert.Nil(t, err) {
+			assert.NotNil(t, program)
+
+			assert.Equal(t, ast.NewWhileStmt(
+				ast.NewBinary(
+					ast.NewIdentifier(identA),
+					ast.NewIdentifier(identB),
+					tokens.NewToken(tokens.LT, "<", "<"),
+				),
+				ast.NewBlockStmt([]ast.Stmt{
+					ast.NewExpressionStmt(
+						ast.NewAssign(
+							identA,
+							ast.NewBinary(
+								ast.NewIdentifier(identA),
+								ast.NewLiteral(oneLiteral),
+								tokens.NewToken(tokens.PLUS, "+", "+"),
+							),
+						),
+					),
+					ast.NewBreakStmt(),
+				}),
+			), program.Stmts[0])
+		}
+	}
+}

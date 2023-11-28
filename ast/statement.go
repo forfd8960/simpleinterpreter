@@ -104,3 +104,14 @@ func (w *WhileStmt) StmtNode() {}
 func (w *WhileStmt) TokenLiteral() string {
 	return "while"
 }
+
+type BreakStmt struct{}
+
+func NewBreakStmt() *BreakStmt {
+	return &BreakStmt{}
+}
+
+func (bk *BreakStmt) StmtNode() {}
+func (bk *BreakStmt) TokenLiteral() string {
+	return "break"
+}
