@@ -101,6 +101,10 @@ func (l *Lexer) scanToken() (*tokens.Token, error) {
 		tok = l.buildToken(tokens.LBRACE, "{")
 	case '}':
 		tok = l.buildToken(tokens.RBRACE, "}")
+	case '[':
+		tok = l.buildToken(tokens.LSQBRACKET, "[")
+	case ']':
+		tok = l.buildToken(tokens.RSQBRACKET, "]")
 	case '"':
 		tok, err = l.parseString()
 	case '.':

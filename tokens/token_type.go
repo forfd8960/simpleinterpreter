@@ -34,10 +34,12 @@ const (
 	SEMICOLON // ;
 	DOT       // .
 
-	LPRARENT // (
-	RPARENT  // )
-	LBRACE   // {
-	RBRACE   // }
+	LPRARENT   // (
+	RPARENT    // )
+	LBRACE     // {
+	RBRACE     // }
+	LSQBRACKET // left square bracket [
+	RSQBRACKET // right square breacket ]
 
 	CLASS    // class
 	THIS     // this

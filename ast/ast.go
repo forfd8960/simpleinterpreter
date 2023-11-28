@@ -271,3 +271,36 @@ func (gp *Grouping) ExprNode() {}
 func (gp *Grouping) TokenLiteral() string {
 	return "grouping"
 }
+
+// let sl = [1, "123", "word"]
+type Slice struct {
+	Elements []Expression
+}
+
+func NewSlice(elements []Expression) *Slice {
+	return &Slice{Elements: elements}
+}
+
+func (sl *Slice) StmtNode() {}
+func (sl *Slice) TokenLiteral() string {
+	return "slice"
+}
+
+// slice[i]
+type SliceAccess struct {
+	Name *Identifier
+	Idx  Expression
+}
+
+func NewSliceAccess(name *Identifier, idx Expression) *SliceAccess {
+	return &SliceAccess{
+		Name: name,
+		Idx:  idx,
+	}
+}
+
+func (sa *SliceAccess) StmtNode() {}
+func (sa *SliceAccess) ExprNode() {}
+func (sa *SliceAccess) TokenLiteral() string {
+	return "slice_access"
+}

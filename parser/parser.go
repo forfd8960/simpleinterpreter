@@ -181,6 +181,8 @@ func (p *Parser) statement() (ast.Stmt, error) {
 		return p.parseBreakStmt()
 	case p.match(tokens.WHILE):
 		return p.whileStatement()
+	case p.match(tokens.LSQBRACKET):
+		return p.sliceStmt()
 	case p.match(tokens.LBRACE):
 		block, err := p.block()
 		if err != nil {
@@ -342,6 +344,10 @@ func (p *Parser) whileStatement() (ast.Stmt, error) {
 	}
 
 	return ast.NewWhileStmt(cond, body), nil
+}
+
+func (p *Parser) sliceStmt() (ast.Stmt, error) {
+	return nil, nil
 }
 
 func (p *Parser) block() (*ast.Block, error) {
@@ -563,6 +569,7 @@ func (p *Parser) call() (ast.Expression, error) {
 	switch {
 	case p.match(tokens.DPlus, tokens.DMinus):
 		expr = ast.NewDExp(expr, p.previous())
+	// case p.match(tokens.LSQBRACKET):
 	default:
 		for {
 			if p.match(tokens.LPRARENT) {
