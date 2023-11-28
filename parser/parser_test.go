@@ -120,9 +120,11 @@ func TestParseFor(t *testing.T) {
 							tokens.NewToken(tokens.LTEQ, "<=", "<="),
 						),
 						ast.NewBlockStmt([]ast.Stmt{
-							ast.NewPrintStmt([]ast.Expression{
-								fmtLiteral,
-								ast.NewIdentifier1("i"),
+							ast.NewBlockStmt([]ast.Stmt{
+								ast.NewPrintStmt([]ast.Expression{
+									fmtLiteral,
+									ast.NewIdentifier1("i"),
+								}),
 							}),
 							ast.NewExpressionStmt(
 								ast.NewAssign(tokens.NewIdentToken("i"), ast.NewBinary(
