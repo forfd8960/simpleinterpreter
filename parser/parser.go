@@ -569,14 +569,12 @@ func (p *Parser) call() (ast.Expression, error) {
 	switch {
 	case p.match(tokens.DPlus, tokens.DMinus):
 		expr = ast.NewDExp(expr, p.previous())
-	// case p.match(tokens.LSQBRACKET):
+	case p.match(tokens.LSQBRACKET):
+		expr, err = p.parseSliceAccess(expr)
 	default:
 		for {
 			if p.match(tokens.LPRARENT) {
 				expr, err = p.finishCall(expr)
-				if err != nil {
-					return nil, err
-				}
 			} else if p.match(tokens.DOT) {
 				name, err := p.consume(tokens.IDENT, "Expect property name after .")
 				if err != nil {
@@ -587,6 +585,10 @@ func (p *Parser) call() (ast.Expression, error) {
 				break
 			}
 		}
+	}
+
+	if err != nil {
+		return nil, err
 	}
 
 	return expr, nil
@@ -606,19 +608,55 @@ func (p *Parser) primary() (ast.Expression, error) {
 		return ast.NewIdentifier(p.previous()), nil
 	case p.match(tokens.THIS):
 		return ast.NewThisExpr(p.previous()), nil
+	case p.match(tokens.LSQBRACKET):
+		return p.parseSlice()
 	case p.match(tokens.LPRARENT):
 		exp, err := p.parseExpr()
 		if err != nil {
 			return nil, err
 		}
 
-		if _, err := p.consume(tokens.RPARENT, "Expect ')' after expression"); err != nil {
-			return nil, err
-		}
 		return ast.NewGrouping(exp), nil
 	}
 
 	return nil, fmt.Errorf("unknow expr")
+}
+
+func (p *Parser) parseSlice() (ast.Expression, error) {
+	elements := make([]ast.Expression, 0, 1)
+	// empty slice
+	if p.match(tokens.RSQBRACKET) {
+		return ast.NewSlice(elements), nil
+	}
+
+	// non-empty slice
+	for {
+		exp, err := p.parseExpr()
+		if err != nil {
+			return nil, err
+		}
+		elements = append(elements, exp)
+
+		if p.match(tokens.RSQBRACKET) {
+			break
+		}
+		if _, err := p.consume(tokens.COMMA, "Expect ',' after slice value"); err != nil {
+			return nil, err
+		}
+	}
+	return ast.NewSlice(elements), nil
+}
+
+func (p *Parser) parseSliceAccess(expr ast.Expression) (ast.Expression, error) {
+	idx, err := p.parseExpr() // get index value
+	if err != nil {
+		return nil, err
+	}
+	if _, err := p.consume(tokens.RSQBRACKET, "Expect ] after index"); err != nil {
+		return nil, err
+	}
+
+	return ast.NewSliceAccess(expr, idx), nil
 }
 
 func (p *Parser) finishCall(callee ast.Expression) (ast.Expression, error) {
@@ -631,7 +669,9 @@ func (p *Parser) finishCall(callee ast.Expression) (ast.Expression, error) {
 		arguments = append(arguments, expr)
 
 		for p.check(tokens.COMMA) {
-			p.consume(tokens.COMMA, "expect comma after (")
+			if _, err := p.consume(tokens.COMMA, "expect comma after ("); err != nil {
+				return nil, err
+			}
 
 			expr, err := p.parseExpr()
 			if err != nil {

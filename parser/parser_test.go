@@ -469,3 +469,53 @@ func TestParseBreakStmt(t *testing.T) {
 		}
 	}
 }
+
+func TestParseSliceStmt(t *testing.T) {
+	input := `
+	let arr = [1,2,3];
+	let arr1 = [true];
+	let arr2 = [];
+	`
+	tokenList, err := lexer.TokensFromInput(input)
+	assert.Nil(t, err)
+
+	arr := tokens.NewToken(tokens.IDENT, "arr", "arr")
+	arr1 := tokens.NewToken(tokens.IDENT, "arr1", "arr1")
+	arr2 := tokens.NewToken(tokens.IDENT, "arr2", "arr2")
+	oneLiteral, _ := ast.NewLiteral1(1)
+	twoLiteral, _ := ast.NewLiteral1(2)
+	threeLiteral, _ := ast.NewLiteral1(3)
+	trueLiteral, _ := ast.NewLiteral1(true)
+
+	p := NewParser(tokenList)
+	if assert.NotNil(t, p) {
+		program, err := p.ParseProgram()
+		if assert.Nil(t, err) {
+			assert.NotNil(t, program)
+
+			assert.Equal(t, ast.NewLetStmt(
+				arr,
+				ast.NewSlice(
+					[]ast.Expression{
+						oneLiteral,
+						twoLiteral,
+						threeLiteral,
+					},
+				),
+			), program.Stmts[0])
+
+			assert.Equal(t, ast.NewLetStmt(
+				arr1,
+				ast.NewSlice([]ast.Expression{trueLiteral}),
+			), program.Stmts[1])
+
+			assert.Equal(t,
+				ast.NewLetStmt(
+					arr2,
+					ast.NewSlice([]ast.Expression{}),
+				),
+				program.Stmts[2],
+			)
+		}
+	}
+}

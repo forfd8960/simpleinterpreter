@@ -281,18 +281,18 @@ func NewSlice(elements []Expression) *Slice {
 	return &Slice{Elements: elements}
 }
 
-func (sl *Slice) StmtNode() {}
+func (sl *Slice) ExprNode() {}
 func (sl *Slice) TokenLiteral() string {
 	return "slice"
 }
 
 // slice[i]
 type SliceAccess struct {
-	Name *Identifier
+	Name Expression
 	Idx  Expression
 }
 
-func NewSliceAccess(name *Identifier, idx Expression) *SliceAccess {
+func NewSliceAccess(name Expression, idx Expression) *SliceAccess {
 	return &SliceAccess{
 		Name: name,
 		Idx:  idx,
