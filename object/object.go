@@ -131,6 +131,17 @@ func (i *Integer) Type() ObjectType {
 	return OBJ_INTEGER
 }
 
+type Slice struct {
+	Elements []Object
+}
+
+func (sl *Slice) Inspect() string {
+	return fmt.Sprintf("slice: [%d]", len(sl.Elements))
+}
+func (sl *Slice) Type() ObjectType {
+	return OBJ_SLICE
+}
+
 type Bool struct {
 	Value bool
 }

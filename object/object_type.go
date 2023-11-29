@@ -10,5 +10,6 @@ const (
 	OBJ_NULL           ObjectType = "NULL"
 	OBJ_RETURN         ObjectType = "RETURN"
 	OBJ_PRINT          ObjectType = "PRINT"
+	OBJ_SLICE          ObjectType = "SLICE"
 	OBJ_ERROR          ObjectType = "ERROR"
 )

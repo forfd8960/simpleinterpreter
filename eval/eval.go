@@ -51,6 +51,8 @@ func Eval(node ast.Node, env *object.Environment) (object.Object, error) {
 		return Eval(v.Expr, env)
 	case *ast.Grouping:
 		return evalGroup(v, env)
+	case *ast.Slice:
+		return evalSlice(v, env)
 	case *ast.Literal:
 		return evalLiteral(v)
 	case *ast.Binary:
@@ -245,6 +247,19 @@ func evalPrintStmt(v *ast.PrintStmt, env *object.Environment) (object.Object, er
 
 func evalGroup(g *ast.Grouping, env *object.Environment) (object.Object, error) {
 	return Eval(g.Expr, env)
+}
+
+func evalSlice(sl *ast.Slice, env *object.Environment) (object.Object, error) {
+	elements := make([]object.Object, 0, len(sl.Elements))
+	for _, e := range sl.Elements {
+		v, err := Eval(e, env)
+		if err != nil {
+			return nil, err
+		}
+		elements = append(elements, v)
+	}
+
+	return &object.Slice{Elements: elements}, nil
 }
 
 func evalLiteral(literal *ast.Literal) (object.Object, error) {
