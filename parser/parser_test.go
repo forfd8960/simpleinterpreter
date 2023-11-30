@@ -519,3 +519,45 @@ func TestParseSliceStmt(t *testing.T) {
 		}
 	}
 }
+
+func TestParseSliceAccessStmt(t *testing.T) {
+	input := `
+	let arr = [1,2,3];
+	arr[0]
+	`
+	tokenList, err := lexer.TokensFromInput(input)
+	assert.Nil(t, err)
+
+	arr := tokens.NewToken(tokens.IDENT, "arr", "arr")
+	zeroLiteral, _ := ast.NewLiteral1(0)
+	oneLiteral, _ := ast.NewLiteral1(1)
+	twoLiteral, _ := ast.NewLiteral1(2)
+	threeLiteral, _ := ast.NewLiteral1(3)
+
+	p := NewParser(tokenList)
+	if assert.NotNil(t, p) {
+		program, err := p.ParseProgram()
+		if assert.Nil(t, err) {
+			assert.NotNil(t, program)
+
+			assert.Equal(t, ast.NewLetStmt(
+				arr,
+				ast.NewSlice(
+					[]ast.Expression{
+						oneLiteral,
+						twoLiteral,
+						threeLiteral,
+					},
+				),
+			), program.Stmts[0])
+
+			assert.Equal(t,
+				ast.NewExpressionStmt(
+					ast.NewSliceAccess(
+						ast.NewIdentifier1("arr"),
+						zeroLiteral,
+					),
+				), program.Stmts[1])
+		}
+	}
+}

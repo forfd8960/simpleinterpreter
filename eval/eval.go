@@ -21,6 +21,9 @@ var (
 	ErrOnlyClassInstanceHaveProperty = "expr: %s can not get property, only class instance have property"
 	ErrThisNotFoundClassInstance     = "this can not found the class instance"
 	ErrCondMustBeBoolValue           = "condition must be a bool value: %v"
+	ErrIDentIsNotSlice               = "identifier: %s is not a slice"
+	ErrIdxIsNotInteger               = "idx: %s is not a integer"
+	ErrIdxOutOfBound                 = "idx: %d out of bound, total length is: %d"
 )
 
 func Eval(node ast.Node, env *object.Environment) (object.Object, error) {
@@ -53,6 +56,8 @@ func Eval(node ast.Node, env *object.Environment) (object.Object, error) {
 		return evalGroup(v, env)
 	case *ast.Slice:
 		return evalSlice(v, env)
+	case *ast.SliceAccess:
+		return evalSliceAccess(v, env)
 	case *ast.Literal:
 		return evalLiteral(v)
 	case *ast.Binary:
@@ -260,6 +265,32 @@ func evalSlice(sl *ast.Slice, env *object.Environment) (object.Object, error) {
 	}
 
 	return &object.Slice{Elements: elements}, nil
+}
+
+func evalSliceAccess(sa *ast.SliceAccess, env *object.Environment) (object.Object, error) {
+	slObj, err := Eval(sa.Name, env)
+	if err != nil {
+		return nil, err
+	}
+	sl, ok := slObj.(*object.Slice)
+	if !ok {
+		return nil, fmt.Errorf(ErrIDentIsNotSlice, sa.Name.TokenLiteral())
+	}
+
+	idxObj, err := Eval(sa.Idx, env)
+	if err != nil {
+		return nil, err
+	}
+	idx, ok := idxObj.(*object.Integer)
+	if !ok {
+		return nil, fmt.Errorf(ErrIdxIsNotInteger, idxObj.Inspect())
+	}
+
+	if idx.Value < 0 || idx.Value >= int64(len(sl.Elements)) {
+		return nil, fmt.Errorf(ErrIdxOutOfBound, idx.Value, len(sl.Elements))
+	}
+
+	return sl.Elements[idx.Value], nil
 }
 
 func evalLiteral(literal *ast.Literal) (object.Object, error) {
