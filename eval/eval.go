@@ -423,6 +423,10 @@ func evalUnary(node *ast.Unary, env *object.Environment) (object.Object, error) 
 }
 
 func evalCall(callExpr *ast.Call, globalEnv *object.Environment) (object.Object, error) {
+	if IsBuiltInFunction(callExpr.Callee.TokenLiteral()) {
+		return evalBuildtInAppend(callExpr, globalEnv)
+	}
+
 	// callExpr.Callee is a identifier, and after Eval, it should return a function object
 	callee, err := Eval(callExpr.Callee, globalEnv)
 	if err != nil {

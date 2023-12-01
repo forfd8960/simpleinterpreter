@@ -141,6 +141,9 @@ func (sl *Slice) Inspect() string {
 func (sl *Slice) Type() ObjectType {
 	return OBJ_SLICE
 }
+func (sl *Slice) Append(e ...Object) {
+	sl.Elements = append(sl.Elements, e...)
+}
 
 type Bool struct {
 	Value bool
