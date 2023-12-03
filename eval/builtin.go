@@ -14,8 +14,9 @@ const (
 )
 
 var (
-	ErrLackParameter        = fmt.Errorf("lack parameters for print")
-	ErrInvalidParameterType = fmt.Errorf("invalid parameters for print(first paramter msut be string)")
+	ErrLackParameter              = fmt.Errorf("lack parameters for print")
+	ErrUnsupportedBuildInFunction = fmt.Errorf("unsupported buildin function")
+	ErrInvalidParameterType       = fmt.Errorf("invalid parameters for print(first paramter msut be string)")
 )
 
 var builtInfunctions = map[string]struct{}{
@@ -51,6 +52,15 @@ var buildPrint = func(callExpr *ast.Call, env *object.Environment) *object.Funct
 
 	return &object.Function{
 		Parameters: identifiers,
+	}
+}
+
+func evalBuildInFunctions(name string, callExpr *ast.Call, globalEnv *object.Environment) (object.Object, error) {
+	switch name {
+	case builtInAppend:
+		return evalBuildtInAppend(callExpr, globalEnv)
+	default:
+		return nil, ErrUnsupportedBuildInFunction
 	}
 }
 
