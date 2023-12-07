@@ -11,6 +11,7 @@ import (
 
 var (
 	ErrPropertyNotFound = "property: %s not found for instance: %s"
+	ErrIdxOutofBound    = "idx: %d is out of bound"
 )
 
 type ObjectType string
@@ -143,6 +144,14 @@ func (sl *Slice) Type() ObjectType {
 }
 func (sl *Slice) Append(e ...Object) {
 	sl.Elements = append(sl.Elements, e...)
+}
+
+func (sl *Slice) Set(obj Object, idx int) error {
+	if idx < 0 || idx >= len(sl.Elements) {
+		return fmt.Errorf(ErrIdxOutofBound, idx)
+	}
+	sl.Elements[idx] = obj
+	return nil
 }
 
 type Bool struct {

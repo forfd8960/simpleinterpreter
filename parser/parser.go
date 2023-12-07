@@ -404,6 +404,8 @@ func (p *Parser) assignment() (ast.Expression, error) {
 		switch v := exp.(type) {
 		case *ast.Identifier:
 			return ast.NewAssign(v.Token, value), nil
+		case *ast.SliceAccess:
+			return ast.NewSliceElementAssign(v, value), nil
 		case *ast.Assign:
 			return ast.NewAssign(v.Name, value), nil
 		case *ast.Get:

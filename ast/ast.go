@@ -304,3 +304,21 @@ func (sa *SliceAccess) ExprNode() {}
 func (sa *SliceAccess) TokenLiteral() string {
 	return "slice_access"
 }
+
+type SliceElementAssign struct {
+	SLA   *SliceAccess
+	Value Expression
+}
+
+func NewSliceElementAssign(sla *SliceAccess, value Expression) *SliceElementAssign {
+	return &SliceElementAssign{
+		SLA:   sla,
+		Value: value,
+	}
+}
+
+func (sea *SliceElementAssign) StmtNode() {}
+func (sea *SliceElementAssign) ExprNode() {}
+func (sea *SliceElementAssign) TokenLiteral() string {
+	return "slice_element_assign"
+}

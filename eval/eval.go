@@ -42,6 +42,8 @@ func Eval(node ast.Node, env *object.Environment) (object.Object, error) {
 		return evalLetStmt(v, env)
 	case *ast.Assign:
 		return evalAssign(v, env)
+	case *ast.SliceElementAssign: // arr[i] = 123
+		return evalSliceElementAssign(v, env)
 	case *ast.Identifier:
 		return evalIdent(v, env)
 	case *ast.IFStmt:
@@ -204,6 +206,35 @@ func evalAssign(assign *ast.Assign, env *object.Environment) (object.Object, err
 
 	env.Set(assign.Name.Literal, obj)
 	return obj, nil
+}
+
+func evalSliceElementAssign(sea *ast.SliceElementAssign, env *object.Environment) (object.Object, error) {
+	slObj, err := Eval(sea.SLA.Name, env)
+	if err != nil {
+		return nil, err
+	}
+
+	sl, ok := slObj.(*object.Slice)
+	if !ok {
+		return nil, fmt.Errorf(ErrIDentIsNotSlice, sea.SLA.Name.TokenLiteral())
+	}
+
+	idxObj, err := Eval(sea.SLA.Idx, env)
+	if err != nil {
+		return nil, err
+	}
+	idx, ok := idxObj.(*object.Integer)
+	if !ok {
+		return nil, fmt.Errorf(ErrIdxIsNotInteger, idxObj.Inspect())
+	}
+
+	setObj, err := Eval(sea.Value, env)
+	if err != nil {
+		return nil, err
+	}
+
+	err = sl.Set(setObj, int(idx.Value))
+	return setObj, err
 }
 
 func evalIdent(ident *ast.Identifier, env *object.Environment) (object.Object, error) {
