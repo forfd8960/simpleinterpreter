@@ -56,6 +56,8 @@ const (
 	WHILE // while
 	PRINT // print()
 	BREAK // break
+
+	WS // space, \r \t \n
 )
 
 const (

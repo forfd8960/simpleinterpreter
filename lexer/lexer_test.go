@@ -42,25 +42,28 @@ func TestLexerLetStmt(t *testing.T) {
 	tests := []struct {
 		expectType tokens.TokenType
 		literal    string
+		val        interface{}
 	}{
-		{tokens.LET, "let"},
-		{tokens.IDENT, "x"},
-		{tokens.ASSIGN, "="},
-		{tokens.INTEGER, "5"},
-		{tokens.SEMICOLON, ";"},
-		{tokens.EOF, "eof"},
+		{tokens.LET, "let", "let"},
+		{tokens.IDENT, "x", "x"},
+		{tokens.ASSIGN, "=", "="},
+		{tokens.INTEGER, "5", int64(5)},
+		{tokens.SEMICOLON, ";", ";"},
+		{tokens.EOF, "eof", nil},
 	}
 
-	lexer := NewLexer(input)
-
-	for _, tt := range tests {
-		t.Run("test-"+tt.literal, func(t *testing.T) {
-			token, err := lexer.NextToken()
-			assert.Nil(t, err)
-			assert.Equal(t, tt.expectType, token.TkType)
-			assert.Equal(t, tt.literal, token.Literal)
+	expectTokens := []*tokens.Token{}
+	for _, tk := range tests {
+		expectTokens = append(expectTokens, &tokens.Token{
+			TkType:  tk.expectType,
+			Literal: tk.literal,
+			Value:   tk.val,
 		})
 	}
+
+	tokens, err := TokensFromInput(input)
+	assert.Nil(t, err)
+	assert.Equal(t, expectTokens, tokens)
 }
 
 func TestComplexTokens(t *testing.T) {
